@@ -26,7 +26,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState")
 	bool IsAlive() const;
 
-
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState|UI")
 	void ShowAbilityConfirmCancelText(bool ShowText);
 
