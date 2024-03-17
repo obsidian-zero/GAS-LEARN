@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/GASCharacterBase.h"
 #include "GASLearn/Public/Player/MyPlayerState.h"
+#include "InputActionValue.h"
 #include "DemoPlayerGASCharacterBase.generated.h"
 
 /**
@@ -31,6 +32,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Demo|Camera")
 	FVector getStartingCameraBoomLocation();
 
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* DefaultMappingContext;
+	
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MoveAction;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* LookAction;
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Camera")
 	float BaseTurnRate = 45.0f;
@@ -67,6 +79,12 @@ protected:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
+	
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
 
 	virtual void OnRep_PlayerState() override;
 
