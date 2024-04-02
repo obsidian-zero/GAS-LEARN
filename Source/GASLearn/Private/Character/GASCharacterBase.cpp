@@ -33,7 +33,7 @@ bool AGASCharacterBase::IsAlive() const
 	return GetHandSize() < GetMaxHandSize();
 }
 
-int32 AGASCharacterBase::GetAbilityLevel(DemoAbilityID AbilityID) const
+int32 AGASCharacterBase::GetAbilityLevel(EDemoAbilityID AbilityID) const
 {
 	return 1;
 }
@@ -154,6 +154,16 @@ void AGASCharacterBase::AddCharacterAbilities()
 	}
 
 	AbilitySystemComponent->CharacterAbilitiesGiven = true;
+}
+
+FGameplayAbilitySpecHandle AGASCharacterBase::AddCharacterAbility(TSubclassOf<UCharacterGameplayAbility> Ability)
+{
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid())
+	{
+		return FGameplayAbilitySpecHandle();
+	}
+
+	return AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, GetAbilityLevel(Ability.GetDefaultObject()->AbilityID), static_cast<int32>(Ability.GetDefaultObject()->AbilityInputID), this));
 }
 
 

@@ -13,6 +13,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Player/MyPlayerState.h"
+#include "Engine.h"
 
 // Sets default values
 ADemoPlayerGASCharacterBase::ADemoPlayerGASCharacterBase(const class FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
@@ -49,6 +50,7 @@ void ADemoPlayerGASCharacterBase::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(SkillMappingContext, 1);
 		}
 	}
 }
@@ -61,11 +63,19 @@ void ADemoPlayerGASCharacterBase::SetupPlayerInputComponent(UInputComponent* Pla
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		UE_LOG(LogInput, Warning, TEXT("USING ENHANCED INPUT COMPONENT"));
+
+		//Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::Move);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::Look);
+
+		//Ability1
+		EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseAbility1);
 	}else
 	{
 		PlayerInputComponent->BindAxis("MoveForward", this, &ADemoPlayerGASCharacterBase::MoveForward);
@@ -93,6 +103,8 @@ void ADemoPlayerGASCharacterBase::PossessedBy(AController* NewController)
 		AddStartupEffects();
 
 		AddCharacterAbilities();
+
+		Ability1Spec = AddCharacterAbility(Ability1);
 	}
 }
 
@@ -157,6 +169,16 @@ void ADemoPlayerGASCharacterBase::MoveRight(float Value)
 {
 	AddMovementInput(UKismetMathLibrary::GetRightVector(FRotator(0.0f, GetControlRotation().Yaw, 0.0f)), Value);
 }
+
+void ADemoPlayerGASCharacterBase::UseAbility1()
+{
+	if (AbilitySystemComponent.IsValid())
+	{
+		AbilitySystemComponent->TryActivateAbility(Ability1Spec, true);
+	}
+}
+
+
 
 void ADemoPlayerGASCharacterBase::OnRep_PlayerState()
 {
@@ -229,8 +251,9 @@ void ADemoPlayerGASCharacterBase::BindASCInput()
 {
 	if (!ASCInputBound && AbilitySystemComponent.IsValid() && IsValid(InputComponent))
 	{
-		const FTopLevelAssetPath AbilityEnumAssetPath = FTopLevelAssetPath(FName("/Script/GASLearn"), FName("DemoAbilityID"));
-		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, FGameplayAbilityInputBinds(FString("ConfirmTarget"),
-			FString("CancelTarget"), AbilityEnumAssetPath, static_cast<int32>(DemoAbilityID::Confirm), static_cast<int32>(DemoAbilityID::Cancel)));
+		const FTopLevelAssetPath AbilityEnumAssetPath = FTopLevelAssetPath(FName("/Script/GASLearn"), FName("EDemoAbilityID"));
+		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent,
+			FGameplayAbilityInputBinds(FString("ConfirmTarget"),FString("CancelTarget"), AbilityEnumAssetPath, static_cast<int32>(EDemoAbilityID::Confirm), static_cast<int32>(EDemoAbilityID::Cancel)));
+		ASCInputBound = true;
 	}
 }

@@ -5,9 +5,10 @@
 #include "CoreMinimal.h"
 
 UENUM(Blueprintable)
-enum class DemoAbilityID: uint8
+enum class EDemoAbilityID: uint8
 {
 	None UMETA(DisplayName = "None"),
 	Confirm UMETA(DisplayName = "Confirm"),
 	Cancel UMETA(DisplayName = "Cancel"),
+	Punch UMETA(DisplayName = "Punch"),
 };

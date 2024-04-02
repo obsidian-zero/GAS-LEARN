@@ -6,6 +6,7 @@
 #include "Character/GASCharacterBase.h"
 #include "GASLearn/Public/Player/MyPlayerState.h"
 #include "InputActionValue.h"
+#include "GASLearn/Public/Character/Abilities/CharacterGameplayAbility.h"
 #include "DemoPlayerGASCharacterBase.generated.h"
 
 /**
@@ -35,14 +36,27 @@ public:
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* SkillMappingContext;
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* JumpAction;
 	
 	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
 	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	/** Ability Input Actions */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Ability1Action;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
+	TSubclassOf<class UCharacterGameplayAbility> Ability1;
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Camera")
 	float BaseTurnRate = 45.0f;
@@ -66,6 +80,8 @@ protected:
 
 	FGameplayTag DeadTag;
 
+	FGameplayAbilitySpecHandle Ability1Spec;
+
 	virtual void BeginPlay() override;
 	
 	void LookUp(float Value);
@@ -79,6 +95,8 @@ protected:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
+
+	void UseAbility1();
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

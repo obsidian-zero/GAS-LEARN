@@ -6,6 +6,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "GASCharacterBase.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, AGASCharacterBase*, DiedCharacter);
 
@@ -27,7 +28,7 @@ public:
 	virtual bool IsAlive() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character")
-	virtual int32 GetAbilityLevel(DemoAbilityID AbilityID) const;
+	virtual int32 GetAbilityLevel(EDemoAbilityID AbilityID) const;
 
 	virtual void RemoveCharacterAbilities();
 
@@ -85,6 +86,8 @@ protected:
 	TArray<TSubclassOf<class UCharacterGameplayAbility>> CharacterAbilities;
 
 	virtual void AddCharacterAbilities();
+
+	FGameplayAbilitySpecHandle AddCharacterAbility(TSubclassOf<class UCharacterGameplayAbility> Ability);
 
 	virtual void InitialAttruibutes();
 
