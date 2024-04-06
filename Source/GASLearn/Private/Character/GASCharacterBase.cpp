@@ -143,8 +143,22 @@ void AGASCharacterBase::FinishDying()
 
 void AGASCharacterBase::AddCharacterAbilities()
 {
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->CharacterAbilitiesGiven)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->CharacterAbilitiesGiven)
 	{
+		bool bIsLocallyControlled = GetLocalRole() != ROLE_Authority;
+		bool isValid = AbilitySystemComponent.IsValid();
+		bool isCharacterAbilitiesGiven = AbilitySystemComponent->CharacterAbilitiesGiven;
+		if (!isValid) {
+			UE_LOG(LogTemp, Warning, TEXT("AbilitySystemComponent is not valid."));
+		}
+
+		if (!isCharacterAbilitiesGiven) {
+			UE_LOG(LogTemp, Warning, TEXT("Character abilities have not been given."));
+		}
+
+		if (!bIsLocallyControlled) {
+			UE_LOG(LogTemp, Warning, TEXT("Not locally controlled or authority."));
+		}
 		return;
 	}
 

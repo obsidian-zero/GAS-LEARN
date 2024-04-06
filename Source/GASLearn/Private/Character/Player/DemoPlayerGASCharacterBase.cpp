@@ -76,6 +76,11 @@ void ADemoPlayerGASCharacterBase::SetupPlayerInputComponent(UInputComponent* Pla
 
 		//Ability1
 		EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseAbility1);
+
+		//AbilityTag
+		EnhancedInputComponent->BindAction(AbilityByTagAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseAbilityByTag);
+
+		
 	}else
 	{
 		PlayerInputComponent->BindAxis("MoveForward", this, &ADemoPlayerGASCharacterBase::MoveForward);
@@ -178,7 +183,13 @@ void ADemoPlayerGASCharacterBase::UseAbility1()
 	}
 }
 
-
+void ADemoPlayerGASCharacterBase::UseAbilityByTag()
+{
+	if(AbilitySystemComponent.IsValid())
+	{
+		AbilitySystemComponent->TryActivateAbilitiesByTag(AbilityTag1, true);
+	}
+}
 
 void ADemoPlayerGASCharacterBase::OnRep_PlayerState()
 {

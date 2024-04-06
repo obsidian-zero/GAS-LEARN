@@ -55,8 +55,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* Ability1Action;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* AbilityByTagAction;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
 	TSubclassOf<class UCharacterGameplayAbility> Ability1;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
+	FGameplayTagContainer AbilityTag1;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Camera")
 	float BaseTurnRate = 45.0f;
@@ -97,6 +104,8 @@ protected:
 	void MoveRight(float Value);
 
 	void UseAbility1();
+
+	void UseAbilityByTag();
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
