@@ -6,6 +6,8 @@
 #include "Character/GASCharacterBase.h"
 #include "GASLearn/Public/Player/MyPlayerState.h"
 #include "InputActionValue.h"
+#include "InputMappingContext.h"
+#include "StructDefine.h"
 #include "GASLearn/Public/Character/Abilities/CharacterGameplayAbility.h"
 #include "DemoPlayerGASCharacterBase.generated.h"
 
@@ -33,12 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Demo|Camera")
 	FVector getStartingCameraBoomLocation();
 
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input", meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* SkillMappingContext;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Input")
+	TArray<FIMC_Priority> IMC_List;
+	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* JumpAction;
@@ -103,9 +102,9 @@ protected:
 
 	void MoveRight(float Value);
 
-	void UseAbility1();
+	void UseAbility1(const FInputActionValue& Value);
 
-	void UseAbilityByTag();
+	void UseAbilityByTag(const FInputActionValue& Value);
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

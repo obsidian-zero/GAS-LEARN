@@ -49,8 +49,13 @@ void ADemoPlayerGASCharacterBase::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			Subsystem->AddMappingContext(SkillMappingContext, 1);
+			for(FIMC_Priority IMC_Priority: IMC_List)
+			{
+				if(IMC_Priority.IMC)
+				{
+					Subsystem->AddMappingContext(IMC_Priority.IMC, IMC_Priority.Priority);
+				}
+			}
 		}
 	}
 }
@@ -175,7 +180,7 @@ void ADemoPlayerGASCharacterBase::MoveRight(float Value)
 	AddMovementInput(UKismetMathLibrary::GetRightVector(FRotator(0.0f, GetControlRotation().Yaw, 0.0f)), Value);
 }
 
-void ADemoPlayerGASCharacterBase::UseAbility1()
+void ADemoPlayerGASCharacterBase::UseAbility1(const FInputActionValue& Value)
 {
 	if (AbilitySystemComponent.IsValid())
 	{
@@ -183,7 +188,7 @@ void ADemoPlayerGASCharacterBase::UseAbility1()
 	}
 }
 
-void ADemoPlayerGASCharacterBase::UseAbilityByTag()
+void ADemoPlayerGASCharacterBase::UseAbilityByTag(const FInputActionValue& Value)
 {
 	if(AbilitySystemComponent.IsValid())
 	{
