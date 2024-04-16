@@ -14,3 +14,5 @@ Content
 *.xcodeproj
 *.xcworkspace
 *.uasset
+/Source/GASLearn/Private/Input
+/Source/GASLearn/Public/Input
