@@ -227,8 +227,18 @@ void AGASCharacterBase::SetSpellSlots(float SpellSlots)
 	}
 }
 
+void AGASCharacterBase::OnHandSizeChanged(const FOnAttributeChangeData & Data)
+{
+	OnHandSizeChangeDelegate.Broadcast(Data.NewValue);
+}
 
-
+void AGASCharacterBase::BindAttributeDelegates()
+{
+	if (AbilitySystemComponent.IsValid())
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHandSizeAttribute()).AddUObject(this, &AGASCharacterBase::OnHandSizeChanged);
+	}
+}
 
 
 // Called when the game starts or when spawned

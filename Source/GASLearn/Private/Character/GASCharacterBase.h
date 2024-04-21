@@ -7,9 +7,10 @@
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "GASLearn/GAS/Attributes/CharacterAttributeSetBase.h"
 #include "GASCharacterBase.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, AGASCharacterBase*, DiedCharacter);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHandSizeChangeDelegate, float, NewHandSize);
 UCLASS()
 class AGASCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -21,8 +22,11 @@ public:
 	
 	AGASCharacterBase(const class FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(BlueprintAssignable, Category = "Demo|Character")
+	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
 	FCharacterDiedDelegate OnCharacterDied;
+
+	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
+	FHandSizeChangeDelegate OnHandSizeChangeDelegate;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character")
 	virtual bool IsAlive() const;
@@ -97,4 +101,7 @@ protected:
 
 	virtual void SetSpellSlots(float SpellSlots);
 
+	void OnHandSizeChanged(const FOnAttributeChangeData& Data);
+
+	void BindAttributeDelegates();
 };

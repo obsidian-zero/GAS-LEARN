@@ -219,6 +219,7 @@ void ADemoPlayerGASCharacterBase::InitializeStartingValues(AMyPlayerState* PS)
 	AttributeSetBase = PS->GetAttributeSetBase();
 
 	AbilitySystemComponent->SetTagMapCount(DeadTag, 0);
+	BindAttributeDelegates();
 	InitialAttruibutes();
 	SetHandSize(0);
 	SetSpellSlots(0);
