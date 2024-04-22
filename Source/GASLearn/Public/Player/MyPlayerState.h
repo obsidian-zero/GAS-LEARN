@@ -30,16 +30,16 @@ public:
 	void ShowAbilityConfirmCancelText(bool ShowText);
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState|Attributes")
-	float GetHandSize() const;
+	float GetHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState|Attributes")
-	float GetMaxHandSize() const;
+	float GetMaxHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState|Attributes")
-	float GetSpellSlots() const;
+	float GetRage() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState|Attributes")
-	float GetMaxSpellSlots() const;
+	float GetMaxRage() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|DemoPlayerState|Attributes")
 	float GetCharacterLevel() const;
@@ -53,18 +53,18 @@ protected:
 
 	FGameplayTag DeadTag;
 
-	FDelegateHandle HandSizeChangedDelegateHandle;
-	FDelegateHandle MaxHandSizeChangedDelegateHandle;
-	FDelegateHandle SpellSlotsChangedDelegateHandle;
-	FDelegateHandle MaxSpellSlotsChangedDelegateHandle;
+	FDelegateHandle HealthChangedDelegateHandle;
+	FDelegateHandle MaxHealthChangedDelegateHandle;
+	FDelegateHandle RageChangedDelegateHandle;
+	FDelegateHandle MaxRageChangedDelegateHandle;
 	FDelegateHandle CharacterLevelChangedDelegateHandle;
 
 	virtual void BeginPlay() override;
 
-	virtual void HandSizeChanged(const FOnAttributeChangeData& Data);
-	virtual void MaxHandSizeChanged(const FOnAttributeChangeData& Data);
-	virtual void SpellSlotsChanged(const FOnAttributeChangeData& Data);
-	virtual void MaxSpellSlotsChanged(const FOnAttributeChangeData& Data);
+	virtual void HealthChanged(const FOnAttributeChangeData& Data);
+	virtual void MaxHealthChanged(const FOnAttributeChangeData& Data);
+	virtual void RageChanged(const FOnAttributeChangeData& Data);
+	virtual void MaxRageChanged(const FOnAttributeChangeData& Data);
 	virtual void CharacterLevelChanged(const FOnAttributeChangeData& Data);
 
 	virtual void StunTagChanged(const FGameplayTag CallBackTag, int32 NewCount);

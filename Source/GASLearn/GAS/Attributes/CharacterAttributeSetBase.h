@@ -27,25 +27,25 @@ public:
 	FGameplayAttributeData Level;
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, Level)
 	
-	// 定义手牌数量属性
-	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_HandSize)
-	FGameplayAttributeData HandSize;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, HandSize)
+	// 生命属性
+	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_Health)
+	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, Health)
 
-	// 定义手牌上限属性
-	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_MaxHandSize)
-	FGameplayAttributeData MaxHandSize;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, MaxHandSize)
+	// 生命值上限属性
+	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_MaxRage)
+	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, MaxHealth)
 
-	// 定义法术位数量属性
-	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_SpellSlots)
-	FGameplayAttributeData SpellSlots;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, SpellSlots)
+	// 定义怒气
+	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_Rage)
+	FGameplayAttributeData Rage;
+	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, Rage)
 
-	// 定义法术位上限属性
-	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_MaxSpellSlots)
-	FGameplayAttributeData MaxSpellSlots;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, MaxSpellSlots)
+	// 定义怒气上限
+	UPROPERTY(BlueprintReadOnly, Category = "Character", ReplicatedUsing = OnRep_MaxRage)
+	FGameplayAttributeData MaxRage;
+	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, MaxRage)
 
 	// 定义伤害元属性
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
@@ -57,16 +57,16 @@ public:
 	virtual void OnRep_Level(const FGameplayAttributeData& OldLevel);
 	
 	UFUNCTION()
-	virtual void OnRep_HandSize(const FGameplayAttributeData& OldHandSize);
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
 
 	UFUNCTION()
-	virtual void OnRep_MaxHandSize(const FGameplayAttributeData& OldMaxHandSize);
+	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
 
 	UFUNCTION()
-	virtual void OnRep_SpellSlots(const FGameplayAttributeData& OldSpellSlots);
+	virtual void OnRep_Rage(const FGameplayAttributeData& OldRage);
 
 	UFUNCTION()
-	virtual void OnRep_MaxSpellSlots(const FGameplayAttributeData& OldMaxSpellSlots);
+	virtual void OnRep_MaxRage(const FGameplayAttributeData& OldMaxRage);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

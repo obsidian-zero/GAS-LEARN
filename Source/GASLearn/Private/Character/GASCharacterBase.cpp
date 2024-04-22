@@ -30,7 +30,7 @@ UAbilitySystemComponent * AGASCharacterBase::GetAbilitySystemComponent() const
 
 bool AGASCharacterBase::IsAlive() const
 {
-	return GetHandSize() < GetMaxHandSize();
+	return GetHealth() >= 0;
 }
 
 int32 AGASCharacterBase::GetAbilityLevel(EDemoAbilityID AbilityID) const
@@ -70,38 +70,38 @@ float AGASCharacterBase::GetCharacterLevel() const
 	return 0.0f;
 }
 
-float AGASCharacterBase::GetHandSize() const
+float AGASCharacterBase::GetHealth() const
 {
 	if(AttributeSetBase.IsValid())
 	{
-		return AttributeSetBase->GetHandSize();
+		return AttributeSetBase->GetHealth();
 	}
 	return 0.0f;
 }
 
-float AGASCharacterBase::GetSpellSlots() const
+float AGASCharacterBase::GetRage() const
 {
 	if(AttributeSetBase.IsValid())
 	{
-		return AttributeSetBase->GetSpellSlots();
+		return AttributeSetBase->GetRage();
 	}
 	return 0.0f;
 }
 
-float AGASCharacterBase::GetMaxHandSize() const
+float AGASCharacterBase::GetMaxHealth() const
 {
 	if(AttributeSetBase.IsValid())
 	{
-		return AttributeSetBase->GetMaxHandSize();
+		return AttributeSetBase->GetMaxHealth();
 	}
 	return 0.0f;
 }
 
-float AGASCharacterBase::GetMaxSpellSlots() const
+float AGASCharacterBase::GetMaxRage() const
 {
 	if(AttributeSetBase.IsValid())
 	{
-		return AttributeSetBase->GetMaxSpellSlots();
+		return AttributeSetBase->GetMaxRage();
 	}
 	return 0.0f;
 }
@@ -167,7 +167,7 @@ FGameplayAbilitySpecHandle AGASCharacterBase::AddCharacterAbility(TSubclassOf<UC
 }
 
 
-void AGASCharacterBase::InitialAttruibutes()
+void AGASCharacterBase::InitialAttributes()
 {
 	if (!AbilitySystemComponent.IsValid())
 	{
@@ -211,32 +211,38 @@ void AGASCharacterBase::AddStartupEffects()
 	AbilitySystemComponent->StartupEffectsApplied = true;
 }
 
-void AGASCharacterBase::SetHandSize(float HandSize)
+void AGASCharacterBase::SetHealth(float Health)
 {
 	if (AttributeSetBase.IsValid())
 	{
-		AttributeSetBase->SetHandSize(HandSize);
+		AttributeSetBase->SetHealth(Health);
 	}
 }
 
-void AGASCharacterBase::SetSpellSlots(float SpellSlots)
+void AGASCharacterBase::SetRage(float Rage)
 {
 	if (AttributeSetBase.IsValid())
 	{
-		AttributeSetBase->SetHandSize(SpellSlots);
+		AttributeSetBase->SetRage(Rage);
 	}
 }
 
-void AGASCharacterBase::OnHandSizeChanged(const FOnAttributeChangeData & Data)
+void AGASCharacterBase::OnHealthChanged(const FOnAttributeChangeData & Data)
 {
-	OnHandSizeChangeDelegate.Broadcast(Data.NewValue);
+	OnHealthChangeDelegate.Broadcast(Data.NewValue);
+}
+
+void AGASCharacterBase::OnMaxHealthChanged(const FOnAttributeChangeData & Data)
+{
+	OnMaxHealthChangeDelegate.Broadcast(Data.NewValue);
 }
 
 void AGASCharacterBase::BindAttributeDelegates()
 {
 	if (AbilitySystemComponent.IsValid())
 	{
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHandSizeAttribute()).AddUObject(this, &AGASCharacterBase::OnHandSizeChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHealthAttribute()).AddUObject(this, &AGASCharacterBase::OnHealthChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxHealthAttribute()).AddUObject(this, &AGASCharacterBase::OnMaxHealthChanged);
 	}
 }
 

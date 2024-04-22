@@ -8,9 +8,11 @@
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GASLearn/GAS/Attributes/CharacterAttributeSetBase.h"
+#include "GASLearn/Public/DelegateDefine.h"
 #include "GASCharacterBase.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, AGASCharacterBase*, DiedCharacter);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHandSizeChangeDelegate, float, NewHandSize);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChangeDelegate, float, NewHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMaxHealthChangeDelegate, float, NewMaxHealth);
 UCLASS()
 class AGASCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -26,7 +28,10 @@ public:
 	FCharacterDiedDelegate OnCharacterDied;
 
 	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
-	FHandSizeChangeDelegate OnHandSizeChangeDelegate;
+	FHealthChangeDelegate OnHealthChangeDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
+	FMaxHealthChangeDelegate OnMaxHealthChangeDelegate;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character")
 	virtual bool IsAlive() const;
@@ -45,16 +50,16 @@ public:
 	float GetCharacterLevel() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character|Attribute")
-	float GetHandSize() const;
+	float GetHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character|Attribute")
-	float GetMaxHandSize() const;
+	float GetMaxHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character|Attribute")
-	float GetSpellSlots() const;
+	float GetRage() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character|Attribute")
-	float GetMaxSpellSlots() const;
+	float GetMaxRage() const;
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -93,15 +98,17 @@ protected:
 
 	FGameplayAbilitySpecHandle AddCharacterAbility(TSubclassOf<class UCharacterGameplayAbility> Ability);
 
-	virtual void InitialAttruibutes();
+	virtual void InitialAttributes();
 
 	virtual void AddStartupEffects();
 
-	virtual void SetHandSize(float HandSize);
+	virtual void SetHealth(float Health);
 
-	virtual void SetSpellSlots(float SpellSlots);
+	virtual void SetRage(float Rage);
 
-	void OnHandSizeChanged(const FOnAttributeChangeData& Data);
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+	void OnMaxHealthChanged(const FOnAttributeChangeData& Data);
 
 	void BindAttributeDelegates();
 };

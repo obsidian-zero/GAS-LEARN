@@ -31,7 +31,7 @@ UCharacterAttributeSetBase* AMyPlayerState::GetAttributeSetBase() const
 
 bool AMyPlayerState::IsAlive() const
 {
-	return GetHandSize() <= GetMaxHandSize();
+	return GetHealth() <= GetMaxHealth();
 }
 
 void AMyPlayerState::ShowAbilityConfirmCancelText(bool ShowText)
@@ -39,24 +39,24 @@ void AMyPlayerState::ShowAbilityConfirmCancelText(bool ShowText)
 	// todo		
 }
 
-float AMyPlayerState::GetHandSize() const
+float AMyPlayerState::GetHealth() const
 {
-	return AttributeSetBase->GetHandSize();
+	return AttributeSetBase->GetHealth();
 }
 
-float AMyPlayerState::GetMaxHandSize() const
+float AMyPlayerState::GetMaxHealth() const
 {
-	return AttributeSetBase->GetMaxHandSize();
+	return AttributeSetBase->GetMaxHealth();
 }
 
-float AMyPlayerState::GetSpellSlots() const
+float AMyPlayerState::GetRage() const
 {
-	return AttributeSetBase->GetSpellSlots();
+	return AttributeSetBase->GetRage();
 }
 
-float AMyPlayerState::GetMaxSpellSlots() const
+float AMyPlayerState::GetMaxRage() const
 {
-	return AttributeSetBase->GetMaxSpellSlots();
+	return AttributeSetBase->GetMaxRage();
 }
 
 float AMyPlayerState::GetCharacterLevel() const
@@ -70,17 +70,13 @@ void AMyPlayerState::BeginPlay()
 
 	if (AbilitySystemComponent)
 	{
-		// 绑定 HandSizeChanged 函数到手牌大小属性改变的委托上
-		HandSizeChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHandSizeAttribute()).AddUObject(this, &AMyPlayerState::HandSizeChanged);
+		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHealthAttribute()).AddUObject(this, &AMyPlayerState::HealthChanged);
+		
+		MaxHealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxHealthAttribute()).AddUObject(this, &AMyPlayerState::MaxHealthChanged);
 
-		// 绑定 MaxHandSizeChanged 函数到最大手牌大小属性改变的委托上
-		MaxHandSizeChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxHandSizeAttribute()).AddUObject(this, &AMyPlayerState::MaxHandSizeChanged);
-
-		// 绑定 SpellSlotsChanged 函数到法术槽属性改变的委托上
-		SpellSlotsChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetSpellSlotsAttribute()).AddUObject(this, &AMyPlayerState::SpellSlotsChanged);
-
-		// 绑定 MaxSpellSlotsChanged 函数到最大法术槽属性改变的委托上
-		MaxSpellSlotsChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxSpellSlotsAttribute()).AddUObject(this, &AMyPlayerState::MaxSpellSlotsChanged);
+		RageChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetRageAttribute()).AddUObject(this, &AMyPlayerState::RageChanged);
+		
+		MaxRageChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxRageAttribute()).AddUObject(this, &AMyPlayerState::MaxRageChanged);
 
 		// 绑定 CharacterLevelChanged 函数到角色等级属性改变的委托上
 		CharacterLevelChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetLevelAttribute()).AddUObject(this, &AMyPlayerState::CharacterLevelChanged);
@@ -92,28 +88,24 @@ void AMyPlayerState::BeginPlay()
 }
 
 
-// Implement the function HandSizeChanged
-void AMyPlayerState:: HandSizeChanged(const FOnAttributeChangeData& Data)
+void AMyPlayerState:: HealthChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("HAND SIZE CHANGE"))
+	UE_LOG(LogTemp, Error, TEXT("HEALTH CHANGE"))
 }
 
-// Implement the function MaxHandSizeChanged
-void AMyPlayerState:: MaxHandSizeChanged(const FOnAttributeChangeData& Data)
+void AMyPlayerState:: MaxHealthChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("MAX HAND SIZE CHANGE"))
+	UE_LOG(LogTemp, Error, TEXT("MAX HEALTH CHANGE"))
 }
 
-// Implement the function SpellSlotsChanged
-void AMyPlayerState:: SpellSlotsChanged(const FOnAttributeChangeData& Data)
+void AMyPlayerState:: RageChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("SPELL SLOTS CHANGE"))
+	UE_LOG(LogTemp, Error, TEXT("RAGE CHANGE"))
 }
 
-// Implement the function MaxSpellSlotsChanged
-void AMyPlayerState:: MaxSpellSlotsChanged(const FOnAttributeChangeData& Data)
+void AMyPlayerState:: MaxRageChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("MAX SPELL SLOTS CHANGE"))
+	UE_LOG(LogTemp, Error, TEXT("MAX RAGE CHANGE"))
 }
 
 // Implement the function CharacterLevelChanged

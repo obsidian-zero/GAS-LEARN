@@ -25,7 +25,5 @@ void AEntityCharacterBase::BeginPlay()
 	EntityAbilitySystemComponent->InitAbilityActorInfo(this, this);
 
 	BindAttributeDelegates();
-	InitialAttruibutes();
-	SetHandSize(0);
-	SetSpellSlots(0);
+	InitialAttributes();
 }

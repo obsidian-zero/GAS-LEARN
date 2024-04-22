@@ -220,9 +220,7 @@ void ADemoPlayerGASCharacterBase::InitializeStartingValues(AMyPlayerState* PS)
 
 	AbilitySystemComponent->SetTagMapCount(DeadTag, 0);
 	BindAttributeDelegates();
-	InitialAttruibutes();
-	SetHandSize(0);
-	SetSpellSlots(0);
+	InitialAttributes();
 }
 
 void ADemoPlayerGASCharacterBase::Move(const FInputActionValue& Value)

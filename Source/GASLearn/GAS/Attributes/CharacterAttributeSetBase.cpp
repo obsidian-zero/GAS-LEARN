@@ -10,24 +10,24 @@ void UCharacterAttributeSetBase::OnRep_Level(const FGameplayAttributeData& OldLe
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, Level, OldLevel);
 }
 
-void UCharacterAttributeSetBase::OnRep_HandSize(const FGameplayAttributeData& OldHandSize)
+void UCharacterAttributeSetBase::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, HandSize, OldHandSize);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, Health, OldHealth);
 }
 
-void UCharacterAttributeSetBase::OnRep_MaxHandSize(const FGameplayAttributeData& OldMaxHandSize)
+void UCharacterAttributeSetBase::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, MaxHandSize, OldMaxHandSize);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, MaxHealth, OldMaxHealth);
 }
 
-void UCharacterAttributeSetBase::OnRep_SpellSlots(const FGameplayAttributeData& OldSpellSlots)
+void UCharacterAttributeSetBase::OnRep_Rage(const FGameplayAttributeData& OldRage)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, SpellSlots, OldSpellSlots);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, Rage, OldRage);
 }
 
-void UCharacterAttributeSetBase::OnRep_MaxSpellSlots(const FGameplayAttributeData& OldMaxSpellSlots)
+void UCharacterAttributeSetBase::OnRep_MaxRage(const FGameplayAttributeData& OldMaxRage)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, MaxSpellSlots, OldMaxSpellSlots);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, MaxRage, OldMaxRage);
 }
 
 void UCharacterAttributeSetBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -35,8 +35,8 @@ void UCharacterAttributeSetBase::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, Level, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, HandSize, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, MaxHandSize, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, SpellSlots, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, MaxSpellSlots, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, Rage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCharacterAttributeSetBase, MaxRage, COND_None, REPNOTIFY_Always);
 }
