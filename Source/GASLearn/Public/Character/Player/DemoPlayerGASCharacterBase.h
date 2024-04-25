@@ -9,6 +9,9 @@
 #include "InputMappingContext.h"
 #include "StructDefine.h"
 #include "GASLearn/Public/Character/Abilities/CharacterGameplayAbility.h"
+#include "Templates/SharedPointer.h"
+
+
 #include "DemoPlayerGASCharacterBase.generated.h"
 
 /**
@@ -50,18 +53,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-	/** Ability Input Actions */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
-	class UInputAction* Ability1Action;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
-	class UInputAction* AbilityByTagAction;
-	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
-	TSubclassOf<class UCharacterGameplayAbility> Ability1;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
-	FGameplayTagContainer AbilityTag1;
+	TArray<FIA_GA> InputAbilityList;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Camera")
@@ -85,8 +78,8 @@ protected:
 	bool ASCInputBound = false;
 
 	FGameplayTag DeadTag;
-
-	FGameplayAbilitySpecHandle Ability1Spec;
+	
+	TMap<UInputAction *, FGameplayAbilitySpecHandle> InputActionToAbilityMap;
 
 	virtual void BeginPlay() override;
 	
@@ -102,9 +95,9 @@ protected:
 
 	void MoveRight(float Value);
 
-	void UseAbility1(const FInputActionValue& Value);
+	void UseAbilityInputAction(const FInputActionInstance& Instance);
 
-	void UseAbilityByTag(const FInputActionValue& Value);
+	void AddInputAbilities();
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

@@ -79,11 +79,10 @@ void ADemoPlayerGASCharacterBase::SetupPlayerInputComponent(UInputComponent* Pla
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::Look);
 
-		//Ability1
-		EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseAbility1);
-
-		//AbilityTag
-		EnhancedInputComponent->BindAction(AbilityByTagAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseAbilityByTag);
+		for(FIA_GA InputAbility: InputAbilityList)
+		{
+			EnhancedInputComponent->BindAction(InputAbility.IA, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseAbilityInputAction);
+		}
 
 		
 	}else
@@ -114,7 +113,7 @@ void ADemoPlayerGASCharacterBase::PossessedBy(AController* NewController)
 
 		AddCharacterAbilities();
 
-		Ability1Spec = AddCharacterAbility(Ability1);
+		AddInputAbilities();
 	}
 }
 
@@ -180,19 +179,33 @@ void ADemoPlayerGASCharacterBase::MoveRight(float Value)
 	AddMovementInput(UKismetMathLibrary::GetRightVector(FRotator(0.0f, GetControlRotation().Yaw, 0.0f)), Value);
 }
 
-void ADemoPlayerGASCharacterBase::UseAbility1(const FInputActionValue& Value)
+void ADemoPlayerGASCharacterBase::UseAbilityInputAction(const FInputActionInstance& InputInstance)
 {
-	if (AbilitySystemComponent.IsValid())
+	const UInputAction* Action = InputInstance.GetSourceAction();
+	const FGameplayAbilitySpecHandle * Spec = InputActionToAbilityMap.Find(Action);
+	if (Spec && AbilitySystemComponent.IsValid())
 	{
-		AbilitySystemComponent->TryActivateAbility(Ability1Spec, true);
+		AbilitySystemComponent->TryActivateAbility(*Spec, true);
+	}
+	else
+	{
+		if (!Spec)
+		{
+			UE_LOG(LogInput, Warning, TEXT("InputActionToAbilityMap does not contain %s"), *Action->GetFName().ToString());
+		}
+		if (!AbilitySystemComponent.IsValid())
+		{
+			UE_LOG(LogInput, Warning, TEXT("AbilitySystemComponent is not valid"));
+		}
 	}
 }
 
-void ADemoPlayerGASCharacterBase::UseAbilityByTag(const FInputActionValue& Value)
+void ADemoPlayerGASCharacterBase::AddInputAbilities()
 {
-	if(AbilitySystemComponent.IsValid())
+	for(FIA_GA InputAbility: InputAbilityList)
 	{
-		AbilitySystemComponent->TryActivateAbilitiesByTag(AbilityTag1, true);
+		FGameplayAbilitySpecHandle AbilitySpec = AddCharacterAbility(InputAbility.GA);
+		InputActionToAbilityMap.Add(InputAbility.IA, AbilitySpec);
 	}
 }
 
