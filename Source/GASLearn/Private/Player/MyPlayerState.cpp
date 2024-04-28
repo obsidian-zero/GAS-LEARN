@@ -90,28 +90,28 @@ void AMyPlayerState::BeginPlay()
 
 void AMyPlayerState:: HealthChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("HEALTH CHANGE"))
+	UE_LOG(LogTemp, Display, TEXT("HEALTH CHANGE"))
 }
 
 void AMyPlayerState:: MaxHealthChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("MAX HEALTH CHANGE"))
+	UE_LOG(LogTemp, Display, TEXT("MAX HEALTH CHANGE"))
 }
 
 void AMyPlayerState:: RageChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("RAGE CHANGE"))
+	UE_LOG(LogTemp, Display, TEXT("RAGE CHANGE"))
 }
 
 void AMyPlayerState:: MaxRageChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("MAX RAGE CHANGE"))
+	UE_LOG(LogTemp, Display, TEXT("MAX RAGE CHANGE"))
 }
 
 // Implement the function CharacterLevelChanged
 void AMyPlayerState:: CharacterLevelChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Error, TEXT("CHARACTER LEVEL CHANGE"))
+	UE_LOG(LogTemp, Display, TEXT("CHARACTER LEVEL CHANGE"))
 }
 
 // Implement the function StunTagChanged
