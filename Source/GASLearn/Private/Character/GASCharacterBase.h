@@ -11,8 +11,7 @@
 #include "GASLearn/Public/DelegateDefine.h"
 #include "GASCharacterBase.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, AGASCharacterBase*, DiedCharacter);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChangeDelegate, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMaxHealthChangeDelegate, float, NewMaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGASCharacterBaseAttributeChangeDelegate, float, NewValue);
 UCLASS()
 class AGASCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -28,10 +27,16 @@ public:
 	FCharacterDiedDelegate OnCharacterDied;
 
 	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
-	FHealthChangeDelegate OnHealthChangeDelegate;
+	FGASCharacterBaseAttributeChangeDelegate OnHealthChangeDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
-	FMaxHealthChangeDelegate OnMaxHealthChangeDelegate;
+	FGASCharacterBaseAttributeChangeDelegate OnMaxHealthChangeDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
+	FGASCharacterBaseAttributeChangeDelegate OnRageChangeDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Demo|Character|Delegate")
+	FGASCharacterBaseAttributeChangeDelegate OnMaxRageChangeDelegate;
 
 	UFUNCTION(BlueprintCallable, Category = "Demo|Character")
 	virtual bool IsAlive() const;
@@ -109,6 +114,11 @@ protected:
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 
 	void OnMaxHealthChanged(const FOnAttributeChangeData& Data);
+
+	void OnRageChanged(const FOnAttributeChangeData& Data);
+
+	void OnMaxRageChanged(const FOnAttributeChangeData& Data);
+
 
 	void BindAttributeDelegates();
 };

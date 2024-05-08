@@ -48,12 +48,12 @@ void UCharacterAttributeSetBase::PreAttributeChange(const FGameplayAttribute& At
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
 	}
-	Super::PreAttributeChange(Attribute, NewValue);
+	// Super::PreAttributeChange(Attribute, NewValue);
 }
 
 void UCharacterAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
-	Super::PostGameplayEffectExecute(Data);
+	// Super::PostGameplayEffectExecute(Data);
 	
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute() || Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
 	{

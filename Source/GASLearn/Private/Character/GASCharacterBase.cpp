@@ -237,12 +237,24 @@ void AGASCharacterBase::OnMaxHealthChanged(const FOnAttributeChangeData & Data)
 	OnMaxHealthChangeDelegate.Broadcast(Data.NewValue);
 }
 
+void AGASCharacterBase::OnRageChanged(const FOnAttributeChangeData & Data)
+{
+	OnRageChangeDelegate.Broadcast(Data.NewValue);
+}
+
+void AGASCharacterBase::OnMaxRageChanged(const FOnAttributeChangeData & Data)
+{
+	OnMaxRageChangeDelegate.Broadcast(Data.NewValue);
+}
+
 void AGASCharacterBase::BindAttributeDelegates()
 {
 	if (AbilitySystemComponent.IsValid())
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHealthAttribute()).AddUObject(this, &AGASCharacterBase::OnHealthChanged);
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxHealthAttribute()).AddUObject(this, &AGASCharacterBase::OnMaxHealthChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetRageAttribute()).AddUObject(this, &AGASCharacterBase::OnRageChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetMaxRageAttribute()).AddUObject(this, &AGASCharacterBase::OnMaxRageChanged);
 	}
 }
 
