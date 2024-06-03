@@ -60,3 +60,9 @@ void UCharacterAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffect
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
 }
+
+bool UCharacterAttributeSetBase::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UCharacterAttributeSetBase::PreGameplayEffectExecute"));
+	return true;
+}
