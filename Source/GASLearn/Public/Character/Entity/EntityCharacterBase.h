@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GASLearn/GAS/Character/Ability/CharacterAbilitySystemComponent.h"
 #include "GASLearn/GAS/Attributes/CharacterAttributeSetBase.h"
+#include "GASLearn/GAS/Attributes/MonsterAttributeSetBase.h"
 #include "Character/GASCharacterBase.h"
 #include "EntityCharacterBase.generated.h"
 

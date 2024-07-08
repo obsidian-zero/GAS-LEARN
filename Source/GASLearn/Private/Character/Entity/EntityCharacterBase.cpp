@@ -11,7 +11,7 @@ AEntityCharacterBase::AEntityCharacterBase(const class FObjectInitializer& Objec
 	EntityAbilitySystemComponent = CreateDefaultSubobject<UCharacterAbilitySystemComponent>(TEXT("EntityAbilitySystemComponent"));
     
 	// 创建属性集组件
-	EntityAttributeSetBase = CreateDefaultSubobject<UCharacterAttributeSetBase>(TEXT("EntityAttributeSetBase"));
+	EntityAttributeSetBase = CreateDefaultSubobject<UMonsterAttributeSetBase>(TEXT("EntityAttributeSetBase"));
 }
 
 void AEntityCharacterBase::BeginPlay()
