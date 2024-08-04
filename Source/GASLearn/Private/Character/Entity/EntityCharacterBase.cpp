@@ -26,4 +26,5 @@ void AEntityCharacterBase::BeginPlay()
 
 	BindAttributeDelegates();
 	InitialAttributes();
+	AddStartupEffects();
 }
