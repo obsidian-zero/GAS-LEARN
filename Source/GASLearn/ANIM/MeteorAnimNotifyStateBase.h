@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "AbilitySystemInterface.h"
+#include "GASLearn/Public/Character/Player/DemoPlayerGASCharacterBase.h"
 #include "MeteorAnimNotifyStateBase.generated.h"
 
 /**

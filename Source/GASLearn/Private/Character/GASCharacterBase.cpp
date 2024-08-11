@@ -148,22 +148,22 @@ void AGASCharacterBase::AddCharacterAbilities()
 		return;
 	}
 
-	for (TSubclassOf<UCharacterGameplayAbility>& StartUpAbility : CharacterAbilities)
+	for (TSubclassOf<UMeteorGameplayAbility>& StartUpAbility : CharacterAbilities)
 	{
-		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartUpAbility, GetAbilityLevel(StartUpAbility.GetDefaultObject()->AbilityID), static_cast<int32>(StartUpAbility.GetDefaultObject()->AbilityInputID), this));
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartUpAbility, 1, 1, this));
 	}
 
 	AbilitySystemComponent->CharacterAbilitiesGiven = true;
 }
 
-FGameplayAbilitySpecHandle AGASCharacterBase::AddCharacterAbility(TSubclassOf<UCharacterGameplayAbility> Ability)
+FGameplayAbilitySpecHandle AGASCharacterBase::AddCharacterAbility(TSubclassOf<UMeteorGameplayAbility> Ability)
 {
 	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid())
 	{
 		return FGameplayAbilitySpecHandle();
 	}
 
-	return AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, GetAbilityLevel(Ability.GetDefaultObject()->AbilityID), static_cast<int32>(Ability.GetDefaultObject()->AbilityInputID), this));
+	return AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, 1, this));
 }
 
 

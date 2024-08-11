@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "StructDefine.h"
+#include "GASLearn/GAS/Ability/ActionGameplayAbility.h"
 #include "GASLearn/Public/Character/Abilities/CharacterGameplayAbility.h"
 #include "Templates/SharedPointer.h"
 
@@ -28,6 +29,8 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	TObjectPtr<UEnhancedInputComponent> BindEnhancedInputComponent;
+	
 	class USpringArmComponent* GetCameraBoom() const;
 
 	class UCameraComponent* GetFollowCamera() const;
@@ -53,10 +56,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
-	TArray<FIA_GA> InputAbilityList;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Input|Action")
+	TArray<UInputAction *> ActionIAs;
 
-protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Meteor|Abilities")
+	TArray<TSubclassOf<UActionGameplayAbility>> StartActionGameplayAbilities;
+
+	TArray<TObjectPtr<UInputAction>> BindedInputActions;
+
+	void BindActionInputAction(TObjectPtr<UInputAction>);
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Camera")
 	float BaseTurnRate = 45.0f;
 
@@ -78,9 +87,24 @@ protected:
 	bool ASCInputBound = false;
 
 	FGameplayTag DeadTag;
-	
-	TMap<UInputAction *, FGameplayAbilitySpecHandle> InputActionToAbilityMap;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meteor|Action")
+	FGameplayTag OnActionTag;
+
+	// 输入动作对应的基本尝试触发技能
+	TMap<UInputAction *, FGameplayAbilitySpecHandle> InputActionToBasicAbilityMap;
+
+	// 输入动作对应的连击尝试触发技能
+	TMap<UInputAction *, FGameplayAbilitySpecHandle> InputActionToComboAbilityMap;
+
+	// 输入动作对应的永久尝试触发技能
+	TMap<UInputAction *, FGameplayAbilitySpecHandle> InputActionToAlwaysAbilityMap;
+
+	// 技能对应的全部输入动作
+	TMap<TSubclassOf<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>> ActionAbilityToInputActionMap;
+
+	TMap<TSubclassOf<UActionGameplayAbility>, FGameplayAbilitySpecHandle> ActionAbilityToSpec;
+	
 	virtual void BeginPlay() override;
 	
 	void LookUp(float Value);
@@ -95,9 +119,15 @@ protected:
 
 	void MoveRight(float Value);
 
-	void UseAbilityInputAction(const FInputActionInstance& Instance);
+	void UseActionGameplayAbility(const FInputActionInstance& Instance);
 
-	void AddInputAbilities();
+	void AddStartActionGameplayAbilities();
+	
+	bool AddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability);
+
+	void ActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility> Ability, TArray<UInputAction *> InputActions);
+
+	void DeActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility> Ability, TArray<UInputAction *> InputActions);
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -110,4 +140,5 @@ protected:
 	void BindASCInput();
 
 	void InitializeStartingValues(AMyPlayerState* PS);
+
 };

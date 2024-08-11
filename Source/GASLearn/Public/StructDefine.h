@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
-#include "GASLearn/Public/Character/Abilities/CharacterGameplayAbility.h"
+#include "GASLearn/GAS/Ability/MeteorGameplayAbility.h"
 
 #include "StructDefine.generated.h"
 
@@ -36,5 +36,5 @@ public:
 
 	/** 一个使用后进行触发的GamplayAbility */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(DisplayName="GA", MakeStructureDefaultValue="None"))
-	TSubclassOf<class UCharacterGameplayAbility> GA;
+	TSubclassOf<class UMeteorGameplayAbility> GA;
 };

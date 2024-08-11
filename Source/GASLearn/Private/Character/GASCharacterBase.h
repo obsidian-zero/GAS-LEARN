@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GASLearn/GAS/Attributes/CharacterAttributeSetBase.h"
+#include "GASLearn/GAS/Ability/MeteorGameplayAbility.h"
 #include "GASLearn/Public/DelegateDefine.h"
 #include "GASCharacterBase.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, AGASCharacterBase*, DiedCharacter);
@@ -97,11 +98,11 @@ protected:
 	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Abilities")
-	TArray<TSubclassOf<class UCharacterGameplayAbility>> CharacterAbilities;
+	TArray<TSubclassOf<class UMeteorGameplayAbility>> CharacterAbilities;
 
 	virtual void AddCharacterAbilities();
 
-	FGameplayAbilitySpecHandle AddCharacterAbility(TSubclassOf<class UCharacterGameplayAbility> Ability);
+	FGameplayAbilitySpecHandle AddCharacterAbility(TSubclassOf<class UMeteorGameplayAbility> Ability);
 
 	virtual void InitialAttributes();
 

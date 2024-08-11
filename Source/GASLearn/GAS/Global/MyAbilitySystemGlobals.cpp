@@ -24,10 +24,13 @@ UGameplayCueManager* UMyAbilitySystemGlobals::GetGameplayCueManager()
 	{
 		// Load specific gameplaycue manager object if specifieif (GlobalGameplayCueManagerName.IsValid())
 		{
-			GlobalGameplayCueManager = LoadObject<UGameplayCueManager>(nullptr, *GlobalGameplayCueManagerName.ToString(), nullptr, LOAD_None, nullptr);
-			if (GlobalGameplayCueManager == nullptr)
+			if (GlobalGameplayCueManagerName.IsValid())
 			{
-				ABILITY_LOG(Error, TEXT("ERROR to Load GameplayCueManager %s"), *GlobalGameplayCueManagerName.ToString() );
+				GlobalGameplayCueManager = LoadObject<UGameplayCueManager>(nullptr, *GlobalGameplayCueManagerName.ToString(), nullptr, LOAD_None, nullptr);
+				if (GlobalGameplayCueManager == nullptr)
+				{
+					ABILITY_LOG(Error, TEXT("ERROR to Load GameplayCueManager %s"), *GlobalGameplayCueManagerName.ToString() );
+				}
 			}
 		}
 
