@@ -56,6 +56,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Demo|Input|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* InteractAction;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Input|Action")
 	TArray<UInputAction *> ActionIAs;
 
@@ -123,7 +126,7 @@ public:
 
 	void AddStartActionGameplayAbilities();
 	
-	bool AddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability);
+	bool onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle);
 
 	void ActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility> Ability, TArray<UInputAction *> InputActions);
 
@@ -134,7 +137,9 @@ public:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-
+	
+	void Interact(const FInputActionValue& Value);
+	
 	virtual void OnRep_PlayerState() override;
 
 	void BindASCInput();

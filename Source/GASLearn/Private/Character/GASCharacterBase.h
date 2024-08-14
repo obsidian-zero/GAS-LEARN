@@ -79,7 +79,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	TWeakObjectPtr<class UCharacterAbilitySystemComponent> AbilitySystemComponent;
+	TWeakObjectPtr<class UAbilitySystemComponent> AbilitySystemComponent;
 	TWeakObjectPtr<class UCharacterAttributeSetBase> AttributeSetBase;
 
 	FGameplayTag DeadTag;

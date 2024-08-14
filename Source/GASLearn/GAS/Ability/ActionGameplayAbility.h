@@ -28,4 +28,6 @@ public:
 	/** 技能的连击输入动作组 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ActionInfo", meta = (AllowPrivateAccess = "true", ToolTip = "这些操作时在其他动作时会尝试激活技能"))
 	TArray<UInputAction*> ComboInputActions;
+
+	void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 };

@@ -82,6 +82,9 @@ void ADemoPlayerGASCharacterBase::SetupPlayerInputComponent(UInputComponent* Pla
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::Look);
 
+		//Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::Interact);
+
 		for(UInputAction * IA: ActionIAs)
 		{
 
@@ -236,17 +239,16 @@ void ADemoPlayerGASCharacterBase::AddStartActionGameplayAbilities()
 {
 	for(TSubclassOf<UActionGameplayAbility> ActionAbility: StartActionGameplayAbilities)
 	{
-		AddActionGameplayAbility(ActionAbility);
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(ActionAbility, 1, 1, this));
+
 	}
 }
 
-bool ADemoPlayerGASCharacterBase::AddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability)
+bool ADemoPlayerGASCharacterBase::onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle)
 {
 	if (Ability && GetLocalRole() == ROLE_Authority && AbilitySystemComponent.IsValid())
 	{
-		
-		FGameplayAbilitySpecHandle AbilitySpecHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, 1, this));
-
+	
 		ActionAbilityToSpec.Add(Ability, AbilitySpecHandle);
 
 		TArray<TObjectPtr<UInputAction>> AbilityInputActions;
@@ -427,6 +429,15 @@ void ADemoPlayerGASCharacterBase::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ADemoPlayerGASCharacterBase::Interact(const FInputActionValue& Value)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact!"));
+	}
+
 }
 
 void ADemoPlayerGASCharacterBase::BindASCInput()

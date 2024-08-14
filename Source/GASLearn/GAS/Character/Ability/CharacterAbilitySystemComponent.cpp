@@ -7,3 +7,18 @@ void UCharacterAbilitySystemComponent::ReceiveDamage(UCharacterAbilitySystemComp
 {
 	ReceivedDamage.Broadcast(SourceASC, UnmitigatedDamage,MitigatedDamage);
 }
+
+void UCharacterAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnGiveAbility(AbilitySpec);
+
+	if (UActionGameplayAbility* Ability = Cast<UActionGameplayAbility>(AbilitySpec.Ability))
+	{
+		if(ADemoPlayerGASCharacterBase* character = Cast<ADemoPlayerGASCharacterBase>(GetAvatarActor()))
+		{
+			character->onAddActionGameplayAbility(Ability->GetClass(), AbilitySpec.Handle);
+		}
+		
+	}
+}
+

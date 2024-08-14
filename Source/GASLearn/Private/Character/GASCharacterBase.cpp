@@ -7,7 +7,6 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GASLearn/GAS/Attributes/CharacterAttributeSetBase.h"
-#include "GASLearn/GAS/Character/Ability/CharacterAbilitySystemComponent.h"
 
 // Sets default values
 AGASCharacterBase::AGASCharacterBase(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -40,25 +39,25 @@ int32 AGASCharacterBase::GetAbilityLevel(EDemoAbilityID AbilityID) const
 
 void AGASCharacterBase::RemoveCharacterAbilities()
 {
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->CharacterAbilitiesGiven)
-	{
-		return;
-	}
-
-	TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
-	for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities()) {
-		if ((Spec.SourceObject == this) && CharacterAbilities.Contains(Spec.Ability->GetClass()))
-		{
-			AbilitiesToRemove.Add(Spec.Handle);
-		}
-	}
-
-	for (int32 i = 0 ; i < AbilitiesToRemove.Num(); i++)
-	{
-		AbilitySystemComponent->ClearAbility(AbilitiesToRemove[i]);
-	}
-
-	AbilitySystemComponent->CharacterAbilitiesGiven = false;
+	// if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->CharacterAbilitiesGiven)
+	// {
+	// 	return;
+	// }
+	//
+	// TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
+	// for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities()) {
+	// 	if ((Spec.SourceObject == this) && CharacterAbilities.Contains(Spec.Ability->GetClass()))
+	// 	{
+	// 		AbilitiesToRemove.Add(Spec.Handle);
+	// 	}
+	// }
+	//
+	// for (int32 i = 0 ; i < AbilitiesToRemove.Num(); i++)
+	// {
+	// 	AbilitySystemComponent->ClearAbility(AbilitiesToRemove[i]);
+	// }
+	//
+	// AbilitySystemComponent->CharacterAbilitiesGiven = false;
 }
 
 float AGASCharacterBase::GetCharacterLevel() const
@@ -108,7 +107,7 @@ float AGASCharacterBase::GetMaxRage() const
 
 void AGASCharacterBase::Die()
 {
-	RemoveCharacterAbilities();
+	// RemoveCharacterAbilities();
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->GravityScale = 0;
@@ -143,7 +142,7 @@ void AGASCharacterBase::FinishDying()
 
 void AGASCharacterBase::AddCharacterAbilities()
 {
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->CharacterAbilitiesGiven)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid())
 	{
 		return;
 	}
@@ -152,8 +151,6 @@ void AGASCharacterBase::AddCharacterAbilities()
 	{
 		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartUpAbility, 1, 1, this));
 	}
-
-	AbilitySystemComponent->CharacterAbilitiesGiven = true;
 }
 
 FGameplayAbilitySpecHandle AGASCharacterBase::AddCharacterAbility(TSubclassOf<UMeteorGameplayAbility> Ability)
@@ -192,7 +189,7 @@ void AGASCharacterBase::InitialAttributes()
 
 void AGASCharacterBase::AddStartupEffects()
 {
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->StartupEffectsApplied)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("START UP EFFECTS NOT APPLIED"));
 		return;
@@ -208,7 +205,6 @@ void AGASCharacterBase::AddStartupEffects()
 			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
 		}
 	}
-	AbilitySystemComponent->StartupEffectsApplied = true;
 }
 
 void AGASCharacterBase::SetHealth(float Health)

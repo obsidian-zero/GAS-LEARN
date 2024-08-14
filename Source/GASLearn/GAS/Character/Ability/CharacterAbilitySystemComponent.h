@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "GASLearn/Public/Character/Player/DemoPlayerGASCharacterBase.h"
 #include "CharacterAbilitySystemComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FReceivedDamageDelegate, UCharacterAbilitySystemComponent*, SourceASC, float, UnmitigatedDamage, float, MitigatedDamage);
@@ -23,4 +24,6 @@ public:
 	FReceivedDamageDelegate ReceivedDamage;
 	
 	virtual void ReceiveDamage(UCharacterAbilitySystemComponent* SourceASC, float UnmitigatedDamage, float MitigatedDamage);
+
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
 };
