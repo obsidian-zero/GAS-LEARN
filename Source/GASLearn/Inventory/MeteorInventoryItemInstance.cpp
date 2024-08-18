@@ -3,6 +3,11 @@
 
 #include "GASLearn/Inventory/MeteorInventoryItemInstance.h"
 
+UMeteorInventoryItemInstance::UMeteorInventoryItemInstance(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+}
+
 const UMeteorInventoryFragmentBase* UMeteorInventoryItemInstance::FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass) const
 {
 	if(FragmentClass != nullptr)

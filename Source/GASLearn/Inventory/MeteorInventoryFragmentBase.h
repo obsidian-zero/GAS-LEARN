@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class GASLEARN_API UMeteorInventoryFragmentBase : public UObject
 {
 	GENERATED_BODY()

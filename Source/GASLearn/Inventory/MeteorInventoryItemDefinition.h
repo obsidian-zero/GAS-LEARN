@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class GASLEARN_API UMeteorInventoryItemDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

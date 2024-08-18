@@ -9,12 +9,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class GASLEARN_API UMeteorInventoryItemInstance : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	UMeteorInventoryItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UMeteorInventoryItemDefinition> ItemDefinition;
 

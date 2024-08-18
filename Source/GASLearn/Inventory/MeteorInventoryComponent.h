@@ -123,9 +123,6 @@ protected:
 
 	FMeteorInventoryItemSlot * GetSlotByHandle(const FMeteorInventoryItemSlotHandle & SlotHandle);
 
-	virtual void CreateInventorySlot();
-
-	virtual void RemoveInventorySlot(const FMeteorInventoryItemSlotHandle & SlotHandle);
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -134,8 +131,16 @@ public:
 
 	void PopulateSlotReferenceArray(TArray<FMeteorInventoryItemSlotHandle> & Handles);
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void CreateInventorySlot();
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void RemoveInventorySlot(const FMeteorInventoryItemSlotHandle & SlotHandle);
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
 	bool PlaceItemIntoSlot(const FMeteorInventoryItemSlotHandle & SlotHandle, UMeteorInventoryItemInstance * ItemInstance);
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
 	bool AddItemToEmptySlot(UMeteorInventoryItemInstance * ItemInstance);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
