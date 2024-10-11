@@ -13,5 +13,11 @@ UCLASS()
 class GASLEARN_API UMeteorStaticMesh_FragmentBase : public UMeteorInventoryFragmentBase
 {
 	GENERATED_BODY()
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Mesh", Replicated)
+	TSoftObjectPtr<UStaticMesh> Mesh;
 	
 };

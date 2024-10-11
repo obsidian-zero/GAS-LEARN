@@ -18,7 +18,12 @@ public:
 	UMeteorInventoryItemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	const UMeteorInventoryFragmentBase* FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
+
+	TSubclassOf<UMeteorInventoryFragmentBase> FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Inventory")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory")
 	TArray<TObjectPtr<UMeteorInventoryFragmentBase>> Fragments;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory")
+	TArray<TSubclassOf<UMeteorInventoryFragmentBase>> DefaultFragments;
 };

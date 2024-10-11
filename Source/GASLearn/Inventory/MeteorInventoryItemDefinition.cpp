@@ -23,3 +23,19 @@ const UMeteorInventoryFragmentBase* UMeteorInventoryItemDefinition::FindFragment
 	
 	return nullptr;
 }
+
+TSubclassOf<UMeteorInventoryFragmentBase> UMeteorInventoryItemDefinition::FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
+{
+	if(FragmentClass != nullptr)
+	{
+		for(TSubclassOf<UMeteorInventoryFragmentBase> Fragment : DefaultFragments)
+		{
+			if(Fragment && Fragment->IsChildOf(FragmentClass))
+			{
+				return Fragment;
+			}
+		}
+	}
+	
+	return nullptr;
+}

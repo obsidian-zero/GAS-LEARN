@@ -3,11 +3,16 @@
 
 #include "GASLearn/Inventory/WorldItem/MeteorLevelPlaceableItem.h"
 
+#include "GASLearn/Inventory/Fragment/LevelStaticMesh_FragmentBase.h"
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
+#include "GASLearn/Inventory/Fragment/MeteorStaticMesh_FragmentBase.h"
+
 // Sets default values
 AMeteorLevelPlaceableItem::AMeteorLevelPlaceableItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("Root");
 #if WITH_EDITOR
@@ -26,52 +31,12 @@ AMeteorLevelPlaceableItem::AMeteorLevelPlaceableItem()
 void AMeteorLevelPlaceableItem::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (bSpawnItemOnBeginPlay)
-	{
-		SpawnWorldItem();
-	}
 }
 
 // Called every frame
 void AMeteorLevelPlaceableItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-}
-
-bool AMeteorLevelPlaceableItem::SpawnWorldItem()
-{
-	if (GetLocalRole() != ROLE_Authority)
-	{
-		return nullptr;
-	}
-	
-
-	FTransform Transform = GetActorTransform();
-	// FArcItemGeneratorContext Context;
-	// UArcItemStackBase* ItemStack = ItemGenerator->GenerateItemStack(Context);
-	//
-	// AArcItemStackWorldObject* StackObject = GetWorld()->SpawnActorDeferred<AArcItemStackWorldObject>(GetDefault<UArcInventoryDeveloperSettings>()->ItemStackWorldObjectClass, Transform);
-	// if (IsValid(StackObject))
-	// {
-	// 	StackObject->SetInventoryStack(ItemStack);
-	// 	UGameplayStatics::FinishSpawningActor(StackObject, Transform);
-	// 	SpawnedItemStack = StackObject;
-	// 	return StackObject;
-	// }
-
-
-	return true;
-}
-
-void AMeteorLevelPlaceableItem::OnSpawnedItemStackConsumed(AActor* Actor)
-{
-	// if (Actor == SpawnedItemStack)
-	// {
-	// 	SpawnedItemStack->OnDestroyed.RemoveDynamic(this, &ThisClass::OnSpawnedItemStackConsumed);
-	// 	SpawnedItemStack = nullptr;
-	// }
 }
 
 #if WITH_EDITOR
@@ -79,41 +44,42 @@ void AMeteorLevelPlaceableItem::PostEditChangeProperty(FPropertyChangedEvent& Pr
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	// 检查 Property 是否有效
-	if (PropertyChangedEvent.Property)
+	//关卡物品摆设时，根据道具定义尝试自动加载mesh
+	if (PropertyChangedEvent.Property && PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(AMeteorLevelPlaceableItem, InventoryItemDefinition) && IsValid(InventoryItemDefinition))
 	{
-		// 检查是否为 Transform 属性变化
-		if (PropertyChangedEvent.Property->GetFName() == TEXT("RelativeLocation"))
+		if (EditorStaticMesh)
 		{
-			FTransform CurrentTransform = GetActorTransform();
-			UE_LOG(LogTemp, Warning, TEXT("Current Transform: %s"), *CurrentTransform.ToString());
+			// 先尝试找到专门的关卡展示fragment
+			if (TSubclassOf<ULevelStaticMesh_FragmentBase> levelFragement = InventoryItemDefinition.GetDefaultObject()->FindDefaultFragmentByClass(ULevelStaticMesh_FragmentBase::StaticClass()))
+			{
+				
+				TSoftObjectPtr<UStaticMesh> Mesh = levelFragement.GetDefaultObject()->Mesh;
+				UAssetManager::GetStreamableManager().RequestAsyncLoad(Mesh.ToSoftObjectPath(), FStreamableDelegate::CreateWeakLambda(this, [this, Mesh]
+				{
+					if(Mesh.IsValid())
+					{
+						EditorStaticMesh->SetStaticMesh(Mesh.Get());
+					}
+				}));
+			
+			}else
+			{
+				// 如果没有专门的关卡展示fragment，就找普通的mesh fragment
+				if(TSubclassOf<UMeteorStaticMesh_FragmentBase> staticMeshFragment = InventoryItemDefinition.GetDefaultObject()->FindDefaultFragmentByClass(UMeteorStaticMesh_FragmentBase::StaticClass()))
+				{
+				
+					TSoftObjectPtr<UStaticMesh> Mesh = staticMeshFragment.GetDefaultObject()->Mesh;
+					UAssetManager::GetStreamableManager().RequestAsyncLoad(Mesh.ToSoftObjectPath(), FStreamableDelegate::CreateWeakLambda(this, [this, Mesh]
+					{
+						if(Mesh.IsValid())
+						{
+							EditorStaticMesh->SetStaticMesh(Mesh.Get());
+						}
+					}));
+				
+				}
+			}
 		}
 	}
-	
-	// if (PropertyChangedEvent.Property && PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(AArcInvPlaceableItem, ItemGenerator) && IsValid(ItemGenerator))
-	// {
-	// 	FArcItemGeneratorContext Context;
-	// 	UArcItemStackBase* ItemStack = ItemGenerator->GenerateItemStack(Context);
-	//
-	// 	if(UArcItemStackModular* MIS = Cast<UArcItemStackModular>(ItemStack))
-	// 	{
-	// 		if (IsValid(EditorStaticMesh))
-	// 		{
-	// 			if (UArcItemFragment_StaticMesh* SMFragment = MIS->FindFirstFragment<UArcItemFragment_StaticMesh>([](UArcItemFragment_StaticMesh* Fragment) -> bool {
-	// 				return Fragment->FragmentTags.HasTag(FArcInvWorldItemMeshTag);
-	// 				}))
-	// 			{
-	// 				TSoftObjectPtr<UStaticMesh> Mesh = SMFragment->Mesh;
-	// 				UAssetManager::GetStreamableManager().RequestAsyncLoad(SMFragment->Mesh.ToSoftObjectPath(), FStreamableDelegate::CreateWeakLambda(this, [this, Mesh]
-	// 				{
-	// 					if(Mesh.IsValid())
-	// 					{
-	// 						EditorStaticMesh->SetStaticMesh(Mesh.Get());
-	// 					}
-	// 				}));
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 #endif

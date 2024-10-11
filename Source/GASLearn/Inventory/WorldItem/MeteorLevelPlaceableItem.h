@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GASLearn/Inventory/MeteorInventoryItemDefinition.h"
+#include "GameplayTagContainer.h"
+
 #include "MeteorLevelPlaceableItem.generated.h"
 
 UCLASS()
@@ -25,15 +28,12 @@ public:
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(EditInstanceOnly, Category = "Inventory")
+	TSubclassOf<UMeteorInventoryItemDefinition> InventoryItemDefinition;
 
-	UPROPERTY(EditAnywhere, Category = "Item")
-	bool bSpawnItemOnBeginPlay;
-
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	virtual bool SpawnWorldItem();
-
-	UFUNCTION()
-	virtual void OnSpawnedItemStackConsumed(AActor* Actor);
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Inventory")
+	FGameplayTagContainer InventoryTags;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
