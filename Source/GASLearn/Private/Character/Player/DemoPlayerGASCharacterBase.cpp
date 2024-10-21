@@ -197,7 +197,6 @@ void ADemoPlayerGASCharacterBase::MoveRight(float Value)
 void ADemoPlayerGASCharacterBase::UseActionGameplayAbility(const FInputActionInstance& InputInstance)
 {
 	const UInputAction* Action = InputInstance.GetSourceAction();
-
 	if (AbilitySystemComponent.IsValid())
 	{
 		if(AbilitySystemComponent->HasMatchingGameplayTag(OnActionTag))
@@ -358,7 +357,7 @@ void ADemoPlayerGASCharacterBase::BindActionInputAction(TObjectPtr<UInputAction>
 {
 	if(!BindedInputActions.Contains(IA) && BindEnhancedInputComponent)
 	{
-		BindEnhancedInputComponent->BindAction(IA, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::UseActionGameplayAbility);
+		BindEnhancedInputComponent->BindAction(IA, ETriggerEvent::Completed, this, &ADemoPlayerGASCharacterBase::UseActionGameplayAbility);
 		
 		BindedInputActions.Add(IA);
 	}
