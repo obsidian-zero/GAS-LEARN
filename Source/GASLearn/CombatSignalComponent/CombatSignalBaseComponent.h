@@ -16,7 +16,7 @@ struct FCombatSignalDataTableRow : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 signalID;
+	int32 signalID = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Name;
