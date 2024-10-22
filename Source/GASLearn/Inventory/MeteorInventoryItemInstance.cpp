@@ -2,6 +2,8 @@
 
 
 #include "GASLearn/Inventory/MeteorInventoryItemInstance.h"
+#include "GASLearn/Inventory/MeteorInventoryFragmentBase.h"
+#include "GASLearn/Inventory/MeteorInventoryItemDefinition.h"
 
 UMeteorInventoryItemInstance::UMeteorInventoryItemInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -14,7 +16,10 @@ const UMeteorInventoryFragmentBase* UMeteorInventoryItemInstance::FindFragmentBy
 	{
 		if(ItemDefinition != nullptr)
 		{
-			return ItemDefinition->FindFragmentByClass(FragmentClass);
+			if(UMeteorInventoryFragmentBase * Fragment = ItemDefinition->FindDefaultFragmentByClass(FragmentClass).GetDefaultObject())
+			{
+				return Fragment;
+			}
 		}
 
 		for (TObjectPtr<UMeteorInventoryFragmentBase> Fragment : DynamicFragmentInstances)
@@ -26,4 +31,35 @@ const UMeteorInventoryFragmentBase* UMeteorInventoryItemInstance::FindFragmentBy
 		}
 	}
 	return nullptr;
+}
+
+void UMeteorInventoryItemInstance::TransferStackOwnership(UMeteorInventoryItemInstance*& ItemInstance, AActor* Owner)
+{
+	// 使用 Rename 方法直接修改所有权, 修改Outer后，能够绑定生命周期到新的Onwer上
+	ItemInstance->Rename(nullptr, Owner);
+    
+	// // 递归处理子物品堆栈的所有权转移
+	// for (FArcSubItemArrayEntry& SubStack : ItemStack->SubItemStacks.Items)
+	// {
+	// 	TransferStackOwnership(SubStack.SubItemStack, Owner);
+	// }
+ //    
+	// // 标记数组为脏数据，以便触发必要的更新
+	// ItemStack->SubItemStacks.MarkArrayDirty();
+}
+
+void UMeteorInventoryItemInstance::SetItemDefinition(TObjectPtr<UMeteorInventoryItemDefinition> InItemDefinition)
+{
+	ItemDefinition = InItemDefinition;
+	DynamicFragmentInstances.Reset();
+
+	for(TSubclassOf<UMeteorInventoryFragmentBase> Fragment: ItemDefinition->DefaultFragments)
+	{
+		if(Fragment.GetDefaultObject()->bIsDynamic)
+		{
+			UMeteorInventoryFragmentBase* DynamicFragment = DuplicateObject<UMeteorInventoryFragmentBase>(Fragment.GetDefaultObject(), this);
+
+			DynamicFragmentInstances.Add(DynamicFragment);
+		}
+	}
 }

@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MeteorInventoryItemDefinition.h"
 #include "MeteorInventoryItemInstance.generated.h"
 
+class UMeteorInventoryItemDefinition;
+class UMeteorInventoryFragmentBase;
 /**
  * 
  */
@@ -22,7 +23,7 @@ public:
 
 	UMeteorInventoryItemDefinition* GetItemDefinition() const { return ItemDefinition; }
 
-	void SetItemDefinition(TObjectPtr<UMeteorInventoryItemDefinition> InItemDefinition) { ItemDefinition = InItemDefinition; }
+	void SetItemDefinition(TObjectPtr<UMeteorInventoryItemDefinition> InItemDefinition);
 	
 	UPROPERTY()
 	TArray<TObjectPtr<UMeteorInventoryFragmentBase>> DynamicFragmentInstances;
@@ -31,8 +32,11 @@ public:
 	const UMeteorInventoryFragmentBase* FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass) const;
 
 	template<typename ResultClass>
-	const ResultClass* FindFragmentByClass(TSubclassOf<ResultClass> FragmentClass) const
+	const ResultClass* FindFragmentByClassType(TSubclassOf<ResultClass> FragmentClass) const
 	{
 		return Cast<ResultClass>(FindFragmentByClass(FragmentClass));
 	}
+
+	static void TransferStackOwnership(UMeteorInventoryItemInstance*& ItemInstance, AActor* Owner);
+
 };

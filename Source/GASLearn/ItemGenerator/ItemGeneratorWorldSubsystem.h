@@ -6,6 +6,8 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "ItemGeneratorWorldSubsystem.generated.h"
 
+class AMeteorLevelPlaceableItem;
+class AMeteorWorldObjectItem;
 /**
  * 
  */
@@ -22,4 +24,9 @@ public:
 	// 重写反初始化方法
 	virtual void Deinitialize() override;
 
+	TObjectPtr<AMeteorWorldObjectItem> CreateWorldItemInstance(TObjectPtr<AMeteorLevelPlaceableItem>);
+
+	bool bIsGetPlaceInfo = false;
+	void GetLevelRefreshActors(bool Force = false);
+	TArray<AActor*> FoundActors;
 };

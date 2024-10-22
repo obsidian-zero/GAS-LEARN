@@ -20,6 +20,16 @@ public:
 	const UMeteorInventoryFragmentBase* FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
 
 	TSubclassOf<UMeteorInventoryFragmentBase> FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
+
+	template <typename T>
+	T* FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
+	{
+		if (TSubclassOf<UMeteorInventoryFragmentBase> fragment = FindDefaultFragmentByClass(FragmentClass))
+		{
+			return Cast<T>(fragment.GetDefaultObject());
+		}
+		return nullptr;
+	}
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory")
 	TArray<TObjectPtr<UMeteorInventoryFragmentBase>> Fragments;

@@ -33,7 +33,7 @@ public:
 	TSubclassOf<UMeteorInventoryItemDefinition> InventoryItemDefinition;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Inventory")
-	FGameplayTagContainer InventoryTags;
+	FGameplayTagContainer RefreshTags;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
