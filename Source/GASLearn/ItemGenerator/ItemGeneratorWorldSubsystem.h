@@ -24,7 +24,8 @@ public:
 	// 重写反初始化方法
 	virtual void Deinitialize() override;
 
-	TObjectPtr<AMeteorWorldObjectItem> CreateWorldItemInstance(TObjectPtr<AMeteorLevelPlaceableItem>);
+	UFUNCTION(BlueprintCallable)
+	AMeteorWorldObjectItem * CreateWorldItemInstance(AMeteorLevelPlaceableItem * PlaceableItem);
 
 	bool bIsGetPlaceInfo = false;
 	void GetLevelRefreshActors(bool Force = false);

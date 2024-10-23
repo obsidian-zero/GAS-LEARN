@@ -19,6 +19,6 @@ public:
 	static bool SpawnWorldItem(UObject* WorldContextObject,  UMeteorInventoryItemInstance* ItemStack, const FTransform& Transform);
 	
 	UFUNCTION(BlueprintCallable, Category = "Item Generator")
-	static UMeteorInventoryItemInstance * GenerateItemInstance(TSubclassOf<UMeteorInventoryItemDefinition>  ItemDefinition);
+	static UMeteorInventoryItemInstance * GenerateItemInstance(UMeteorInventoryItemDefinition * ItemDefinition);
 
 };

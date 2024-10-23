@@ -10,14 +10,14 @@ bool UMeteorInventoryBPFunctionLibrary::SpawnWorldItem(UObject* WorldContextObje
 	return true;
 }
 
-UMeteorInventoryItemInstance * UMeteorInventoryBPFunctionLibrary::GenerateItemInstance(TSubclassOf<UMeteorInventoryItemDefinition>  ItemDefinition)
+UMeteorInventoryItemInstance * UMeteorInventoryBPFunctionLibrary::GenerateItemInstance(UMeteorInventoryItemDefinition * ItemDefinition)
 {
-	TObjectPtr<UMeteorInventoryItemInstance> Instance = NewObject<UMeteorInventoryItemInstance>(GetTransientPackage(), ItemDefinition);
+	TObjectPtr<UMeteorInventoryItemInstance> Instance = NewObject<UMeteorInventoryItemInstance>(GetTransientPackage(), UMeteorInventoryItemInstance::StaticClass());
 	
 	if (IsValid(Instance))
 	{
-		Instance->SetItemDefinition(ItemDefinition.GetDefaultObject());
+		Instance->SetItemDefinition(ItemDefinition);
 	}
-
+	
 	return Instance;
 }

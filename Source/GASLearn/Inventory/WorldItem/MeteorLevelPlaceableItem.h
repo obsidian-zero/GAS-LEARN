@@ -30,7 +30,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UPROPERTY(EditInstanceOnly, Category = "Inventory")
-	TSubclassOf<UMeteorInventoryItemDefinition> InventoryItemDefinition;
+	TObjectPtr<UMeteorInventoryItemDefinition> InventoryItemDefinition;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Inventory")
 	FGameplayTagContainer RefreshTags;

@@ -9,14 +9,14 @@
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(DefaultToInstanced, EditInlineNew, BlueprintType, Abstract)
 class GASLEARN_API UMeteorInventoryFragmentBase : public UObject
 {
 	GENERATED_BODY()
 public:
 	// virtual void OnInstancedCreated(UMeteorInventoryItemInstance* Instance) const {};
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	bool bIsDynamic = false; //在ItemInstance中，是否转换成动态的Fragment，说明该Fragment是具备逻辑的且要保存状态的
 	
 };

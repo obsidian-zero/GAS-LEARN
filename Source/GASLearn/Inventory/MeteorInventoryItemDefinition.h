@@ -10,30 +10,25 @@
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(BlueprintType)
 class GASLEARN_API UMeteorInventoryItemDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
 	UMeteorInventoryItemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	const UMeteorInventoryFragmentBase* FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
-
-	TSubclassOf<UMeteorInventoryFragmentBase> FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
-
+	const TObjectPtr<UMeteorInventoryFragmentBase> FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass);
+	
 	template <typename T>
-	T* FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
+	T* FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
 	{
-		if (TSubclassOf<UMeteorInventoryFragmentBase> fragment = FindDefaultFragmentByClass(FragmentClass))
+		if (TObjectPtr<UMeteorInventoryFragmentBase> fragment = FindFragmentByClass(FragmentClass))
 		{
-			return Cast<T>(fragment.GetDefaultObject());
+			return Cast<T>(fragment);
 		}
 		return nullptr;
 	}
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory")
 	TArray<TObjectPtr<UMeteorInventoryFragmentBase>> Fragments;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory")
-	TArray<TSubclassOf<UMeteorInventoryFragmentBase>> DefaultFragments;
 };

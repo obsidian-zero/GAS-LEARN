@@ -16,7 +16,7 @@ const UMeteorInventoryFragmentBase* UMeteorInventoryItemInstance::FindFragmentBy
 	{
 		if(ItemDefinition != nullptr)
 		{
-			if(UMeteorInventoryFragmentBase * Fragment = ItemDefinition->FindDefaultFragmentByClass(FragmentClass).GetDefaultObject())
+			if(UMeteorInventoryFragmentBase * Fragment = ItemDefinition->FindFragmentByClass(FragmentClass))
 			{
 				return Fragment;
 			}
@@ -53,11 +53,11 @@ void UMeteorInventoryItemInstance::SetItemDefinition(TObjectPtr<UMeteorInventory
 	ItemDefinition = InItemDefinition;
 	DynamicFragmentInstances.Reset();
 
-	for(TSubclassOf<UMeteorInventoryFragmentBase> Fragment: ItemDefinition->DefaultFragments)
+	for(TObjectPtr<UMeteorInventoryFragmentBase> Fragment: ItemDefinition->Fragments)
 	{
-		if(Fragment.GetDefaultObject()->bIsDynamic)
+		if(Fragment->bIsDynamic)
 		{
-			UMeteorInventoryFragmentBase* DynamicFragment = DuplicateObject<UMeteorInventoryFragmentBase>(Fragment.GetDefaultObject(), this);
+			UMeteorInventoryFragmentBase* DynamicFragment = DuplicateObject<UMeteorInventoryFragmentBase>(Fragment, this);
 
 			DynamicFragmentInstances.Add(DynamicFragment);
 		}

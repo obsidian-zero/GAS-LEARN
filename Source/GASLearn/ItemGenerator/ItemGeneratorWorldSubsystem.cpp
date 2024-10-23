@@ -40,7 +40,7 @@ void UItemGeneratorWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-TObjectPtr<AMeteorWorldObjectItem> UItemGeneratorWorldSubsystem::CreateWorldItemInstance(TObjectPtr<AMeteorLevelPlaceableItem> PlaceableItem)
+AMeteorWorldObjectItem* UItemGeneratorWorldSubsystem::CreateWorldItemInstance(AMeteorLevelPlaceableItem * PlaceableItem)
 {
 	if (!IsValid(PlaceableItem))
 	{

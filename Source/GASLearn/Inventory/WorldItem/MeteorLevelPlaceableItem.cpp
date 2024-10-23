@@ -50,7 +50,7 @@ void AMeteorLevelPlaceableItem::PostEditChangeProperty(FPropertyChangedEvent& Pr
 		if (EditorStaticMesh)
 		{
 			// 先尝试找到专门的关卡展示fragment
-			if (ULevelStaticMesh_FragmentBase* levelFragement = InventoryItemDefinition.GetDefaultObject()->FindDefaultFragmentByClass<ULevelStaticMesh_FragmentBase>(ULevelStaticMesh_FragmentBase::StaticClass()))
+			if (ULevelStaticMesh_FragmentBase* levelFragement = InventoryItemDefinition->FindFragmentByClass<ULevelStaticMesh_FragmentBase>(ULevelStaticMesh_FragmentBase::StaticClass()))
 			{
 				TSoftObjectPtr<UStaticMesh> Mesh = levelFragement->Mesh;
 				UAssetManager::GetStreamableManager().RequestAsyncLoad(Mesh.ToSoftObjectPath(), FStreamableDelegate::CreateWeakLambda(this, [this, Mesh]
@@ -64,7 +64,7 @@ void AMeteorLevelPlaceableItem::PostEditChangeProperty(FPropertyChangedEvent& Pr
 			}else
 			{
 				// 如果没有专门的关卡展示fragment，就找普通的mesh fragment
-				if(UMeteorStaticMesh_FragmentBase * staticMeshFragment = InventoryItemDefinition.GetDefaultObject()->FindDefaultFragmentByClass<UMeteorStaticMesh_FragmentBase>(UMeteorStaticMesh_FragmentBase::StaticClass()))
+				if(UMeteorStaticMesh_FragmentBase * staticMeshFragment = InventoryItemDefinition->FindFragmentByClass<UMeteorStaticMesh_FragmentBase>(UMeteorStaticMesh_FragmentBase::StaticClass()))
 				{
 				
 					TSoftObjectPtr<UStaticMesh> Mesh = staticMeshFragment->Mesh;

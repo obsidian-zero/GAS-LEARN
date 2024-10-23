@@ -8,29 +8,13 @@ UMeteorInventoryItemDefinition::UMeteorInventoryItemDefinition(const FObjectInit
 {
 }
 
-const UMeteorInventoryFragmentBase* UMeteorInventoryItemDefinition::FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
+const TObjectPtr<UMeteorInventoryFragmentBase> UMeteorInventoryItemDefinition::FindFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
 {
 	if(FragmentClass != nullptr)
 	{
 		for(UMeteorInventoryFragmentBase *Fragment : Fragments)
 		{
 			if(Fragment && Fragment->IsA(FragmentClass))
-			{
-				return Fragment;
-			}
-		}
-	}
-	
-	return nullptr;
-}
-
-TSubclassOf<UMeteorInventoryFragmentBase> UMeteorInventoryItemDefinition::FindDefaultFragmentByClass(TSubclassOf<UMeteorInventoryFragmentBase> FragmentClass)
-{
-	if(FragmentClass != nullptr)
-	{
-		for(TSubclassOf<UMeteorInventoryFragmentBase> Fragment : DefaultFragments)
-		{
-			if(Fragment && Fragment->IsChildOf(FragmentClass))
 			{
 				return Fragment;
 			}
