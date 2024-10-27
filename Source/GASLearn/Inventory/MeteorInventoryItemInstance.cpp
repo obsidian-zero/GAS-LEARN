@@ -35,17 +35,12 @@ const UMeteorInventoryFragmentBase* UMeteorInventoryItemInstance::FindFragmentBy
 
 void UMeteorInventoryItemInstance::TransferStackOwnership(UMeteorInventoryItemInstance*& ItemInstance, AActor* Owner)
 {
-	// 使用 Rename 方法直接修改所有权, 修改Outer后，能够绑定生命周期到新的Onwer上
+
+	AActor* OldOwner = Cast<AActor>(ItemInstance->GetOuter());
+	// 使用 Rename 方法直接修改所有权, 修改Outer后，能够绑定生命周期到新的Onwer
 	ItemInstance->Rename(nullptr, Owner);
-    
-	// // 递归处理子物品堆栈的所有权转移
-	// for (FArcSubItemArrayEntry& SubStack : ItemStack->SubItemStacks.Items)
-	// {
-	// 	TransferStackOwnership(SubStack.SubItemStack, Owner);
-	// }
- //    
-	// // 标记数组为脏数据，以便触发必要的更新
-	// ItemStack->SubItemStacks.MarkArrayDirty();
+
+	ItemInstance->OnItemInstanceOwnerChanged.Broadcast(ItemInstance, OldOwner, Owner);
 }
 
 void UMeteorInventoryItemInstance::SetItemDefinition(TObjectPtr<UMeteorInventoryItemDefinition> InItemDefinition)
@@ -61,5 +56,6 @@ void UMeteorInventoryItemInstance::SetItemDefinition(TObjectPtr<UMeteorInventory
 
 			DynamicFragmentInstances.Add(DynamicFragment);
 		}
+		Fragment->onItemInstancedCreated(this);
 	}
 }

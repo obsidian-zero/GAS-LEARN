@@ -40,7 +40,7 @@ void UItemGeneratorWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-AMeteorWorldObjectItem* UItemGeneratorWorldSubsystem::CreateWorldItemInstance(AMeteorLevelPlaceableItem * PlaceableItem)
+AMeteorWorldObjectItem* UItemGeneratorWorldSubsystem::CreateWorldItemInstanceByPlaceItem(AMeteorLevelPlaceableItem * PlaceableItem)
 {
 	if (!IsValid(PlaceableItem))
 	{
@@ -48,17 +48,34 @@ AMeteorWorldObjectItem* UItemGeneratorWorldSubsystem::CreateWorldItemInstance(AM
 	}
 
 	FTransform Transform = PlaceableItem->GetActorTransform();
-	UMeteorInventoryBPFunctionLibrary::GenerateItemInstance(PlaceableItem->InventoryItemDefinition);
+	return CreateWorldItemInstanceByDefinition(PlaceableItem->InventoryItemDefinition, Transform);
+}
+
+AMeteorWorldObjectItem* UItemGeneratorWorldSubsystem::CreateWorldItemInstanceByDefinition(UMeteorInventoryItemDefinition* ItemDefinition, const FTransform& Transform)
+{
+	if (!IsValid(ItemDefinition))
+	{
+		return nullptr;
+	}
+	
+	UMeteorInventoryItemInstance * ItemInstance = UMeteorInventoryBPFunctionLibrary::GenerateItemInstance(ItemDefinition);
+	
+	return CreateWorldItemInstanceForItemInstance(ItemInstance, Transform);
+}
+
+AMeteorWorldObjectItem* UItemGeneratorWorldSubsystem::CreateWorldItemInstanceForItemInstance(UMeteorInventoryItemInstance* ItemInstance, const FTransform& Transform)
+{
+	if (!IsValid(ItemInstance))
+	{
+		return nullptr;
+	}
+
+	AMeteorWorldObjectItem* WorldObject = GetWorld()->SpawnActorDeferred<AMeteorWorldObjectItem>(AMeteorWorldObjectItem::StaticClass(), Transform);
+	if (IsValid(WorldObject))
+	{
+		WorldObject->SetInventoryInstance(ItemInstance);
+		UGameplayStatics::FinishSpawningActor(WorldObject, Transform);
+		return WorldObject;
+	}
 	return nullptr;
-	// .get * ItemStack = ItemGenerator->GenerateItemStack(Context);
-	//
-	// AArcItemStackWorldObject* StackObject = GetWorld()->SpawnActorDeferred<AArcItemStackWorldObject>(GetDefault<UArcInventoryDeveloperSettings>()->ItemStackWorldObjectClass, Transform);
-	// if (IsValid(StackObject))
-	// {
-	// 	StackObject->SetInventoryStack(ItemStack);
-	// 	UGameplayStatics::FinishSpawningActor(StackObject, Transform);
-	// 	SpawnedItemStack = StackObject;
-	// 	return StackObject;
-	// }
-	// return *WorldItem;
 }

@@ -2,7 +2,7 @@
 
 
 #include "GASLearn/Inventory/MeteorInventoryComponent.h"
-
+#include "GASLearn/Inventory/MeteorInventoryItemInstance.h"
 // Sets default values for this component's properties
 UMeteorInventoryComponent::UMeteorInventoryComponent()
 {
@@ -97,6 +97,8 @@ bool UMeteorInventoryComponent::PlaceItemIntoSlot(const FMeteorInventoryItemSlot
 	if(FMeteorInventoryItemSlot * Slot = GetSlotByHandle(SlotHandle))
 	{
 		Slot->ItemInstance = ItemInstance;
+		ItemInstance->TransferStackOwnership(ItemInstance, GetOwner());
+		OnInventoryUpdate.Broadcast(this);
 		return true;
 	}
 	return false;
@@ -117,14 +119,20 @@ bool UMeteorInventoryComponent::AddItemToEmptySlot(UMeteorInventoryItemInstance 
 	return false;
 }
 
-bool UMeteorInventoryComponent::RemoveItemFromSlot(const FMeteorInventoryItemSlotHandle & SlotHandle)
+UMeteorInventoryItemInstance * UMeteorInventoryComponent::RemoveItemFromSlot(const FMeteorInventoryItemSlotHandle & SlotHandle)
 {
 	if(FMeteorInventoryItemSlot * Slot = GetSlotByHandle(SlotHandle))
 	{
-		Slot->ItemInstance = nullptr;
-		return true;
+		if (Slot->ItemInstance != nullptr)
+		{
+			UMeteorInventoryItemInstance * ItemInstance = Slot->ItemInstance;
+			ItemInstance->TransferStackOwnership(ItemInstance, nullptr);
+			Slot->ItemInstance = nullptr;
+			OnInventoryUpdate.Broadcast(this);
+			return ItemInstance;
+		}
 	}
-	return false;
+	return nullptr;
 }
 
 void UMeteorInventoryComponent::RemoveAllItemsFromSlot(TArray<UMeteorInventoryItemInstance *> & OutItemRemoved)

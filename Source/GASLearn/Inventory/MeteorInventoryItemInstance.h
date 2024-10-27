@@ -7,9 +7,9 @@
 
 class UMeteorInventoryItemDefinition;
 class UMeteorInventoryFragmentBase;
-/**
- * 
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemInstanceChangedOwner, UMeteorInventoryItemInstance*, ItemInstance, AActor*, OldOwner, AActor*, NewOwner);
+
 UCLASS(Blueprintable)
 class GASLEARN_API UMeteorInventoryItemInstance : public UObject
 {
@@ -39,4 +39,6 @@ public:
 
 	static void TransferStackOwnership(UMeteorInventoryItemInstance*& ItemInstance, AActor* Owner);
 
+	UPROPERTY(BlueprintAssignable, Category="Inventory")
+	FOnItemInstanceChangedOwner OnItemInstanceOwnerChanged;
 };

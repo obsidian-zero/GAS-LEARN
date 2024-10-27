@@ -2,7 +2,7 @@
 
 
 #include "GASLearn/Inventory/WorldItem/MeteorWorldObjectItem.h"
-
+#include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
 #include "GASLearn/Inventory/Fragment/MeteorStaticMesh_FragmentBase.h"
 
@@ -12,6 +12,13 @@ AMeteorWorldObjectItem::AMeteorWorldObjectItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Default Mesh"));
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
+
+	RootComponent = StaticMeshComponent;
+
+	InventoryInstance = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -39,12 +46,15 @@ void AMeteorWorldObjectItem::SetInventoryInstance_Implementation(UMeteorInventor
 	
 	if (const UMeteorStaticMesh_FragmentBase* SMFragment = InventoryInstance->FindFragmentByClassType<UMeteorStaticMesh_FragmentBase>(UMeteorStaticMesh_FragmentBase::StaticClass()))
 	{
-		FStreamableManager Manager;
 		TSoftObjectPtr<UStaticMesh> Mesh = SMFragment->Mesh;
-		Manager.RequestAsyncLoad(SMFragment->Mesh.LoadSynchronous(), FStreamableDelegate::CreateWeakLambda(this, [this, Mesh]
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(Mesh.ToSoftObjectPath(), FStreamableDelegate::CreateWeakLambda(this, [this, Mesh]
 		{
-			StaticMeshComponent->SetStaticMesh(Mesh.LoadSynchronous());
+			if(Mesh.IsValid())
+			{
+				StaticMeshComponent->SetStaticMesh(Mesh.Get());
+			}
 		}));
+
 	}
 }
 

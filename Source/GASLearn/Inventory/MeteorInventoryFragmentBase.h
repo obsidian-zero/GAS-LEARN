@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "MeteorInventoryItemInstance.h"
 #include "MeteorInventoryFragmentBase.generated.h"
 
+class UMeteorInventoryItemInstance;
 /**
  * 
  */
@@ -18,5 +18,8 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	bool bIsDynamic = false; //在ItemInstance中，是否转换成动态的Fragment，说明该Fragment是具备逻辑的且要保存状态的
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Inventory")
+	void onItemInstancedCreated(UMeteorInventoryItemInstance * ItemInstance);
 	
 };

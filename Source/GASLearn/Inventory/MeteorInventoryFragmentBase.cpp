@@ -2,4 +2,8 @@
 
 
 #include "GASLearn/Inventory/MeteorInventoryFragmentBase.h"
+#include "MeteorInventoryItemInstance.h"
 
+void UMeteorInventoryFragmentBase::onItemInstancedCreated_Implementation(UMeteorInventoryItemInstance * ItemInstance)
+{
+}

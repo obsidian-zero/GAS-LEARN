@@ -7,6 +7,11 @@
 
 #include "MeteorInventoryComponent.generated.h"
 
+
+class UMeteorInventoryItemInstance;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryComponentUpdate, class UMeteorInventoryComponent*, Inventory);
+
 USTRUCT(BlueprintType)
 struct FMeteorInventoryItemSlot
 {
@@ -123,6 +128,9 @@ protected:
 
 	FMeteorInventoryItemSlot * GetSlotByHandle(const FMeteorInventoryItemSlotHandle & SlotHandle);
 
+	UPROPERTY(BlueprintAssignable, Category = "Arc|Inventory")
+	FOnInventoryComponentUpdate OnInventoryUpdate;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -144,7 +152,7 @@ public:
 	bool AddItemToEmptySlot(UMeteorInventoryItemInstance * ItemInstance);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	virtual bool RemoveItemFromSlot(const FMeteorInventoryItemSlotHandle & SlotHandle);
+	virtual UMeteorInventoryItemInstance * RemoveItemFromSlot(const FMeteorInventoryItemSlotHandle & SlotHandle);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void RemoveAllItemsFromSlot(TArray<UMeteorInventoryItemInstance *> & OutItemRemoved);

@@ -8,6 +8,8 @@
 
 class AMeteorLevelPlaceableItem;
 class AMeteorWorldObjectItem;
+class UMeteorInventoryItemDefinition;
+class UMeteorInventoryItemInstance;
 /**
  * 
  */
@@ -25,7 +27,13 @@ public:
 	virtual void Deinitialize() override;
 
 	UFUNCTION(BlueprintCallable)
-	AMeteorWorldObjectItem * CreateWorldItemInstance(AMeteorLevelPlaceableItem * PlaceableItem);
+	AMeteorWorldObjectItem * CreateWorldItemInstanceByPlaceItem(AMeteorLevelPlaceableItem * PlaceableItem);
+
+	UFUNCTION(BlueprintCallable)
+	AMeteorWorldObjectItem* CreateWorldItemInstanceByDefinition(UMeteorInventoryItemDefinition* ItemDefinition, const FTransform& Transform);
+
+	UFUNCTION(BlueprintCallable)
+	AMeteorWorldObjectItem* CreateWorldItemInstanceForItemInstance(UMeteorInventoryItemInstance* ItemInstance, const FTransform& Transform);
 
 	bool bIsGetPlaceInfo = false;
 	void GetLevelRefreshActors(bool Force = false);
