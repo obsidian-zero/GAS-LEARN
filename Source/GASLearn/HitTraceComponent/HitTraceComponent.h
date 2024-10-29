@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "HitTraceComponent.generated.h"
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHitTraceDelegate, const FHitResult&, HitResult, FString, TaskName, AActor* ,HitActor);
 
 USTRUCT(BlueprintType)
 struct FHitTraceTaskInfo
@@ -83,8 +84,8 @@ struct FHitTraceRunTime
 	FHitTraceRunTime()
 		:	HitTraceTaskInfo(), // 调用默认构造函数
 			HitActors(),        // 初始化 TArray
-			IgnoreActors(),		// 初始化 TArray
 			checkTime(0.0f),    // 初始化 checkTime
+			IgnoreActors(),		// 初始化 TArray
 			lastStartPos(FVector::ZeroVector), // 初始化 lastStartPos
 			lastEndPos(FVector::ZeroVector)    // 初始化 lastEndPos
 		{
@@ -94,8 +95,8 @@ struct FHitTraceRunTime
 	FHitTraceRunTime(FHitTraceTaskInfo InHitTraceTaskInfo)
 		:	HitTraceTaskInfo(InHitTraceTaskInfo), // 使用成员初始化列表
 			HitActors(),        // 初始化 TArray
-			IgnoreActors(),		// 初始化 TArray
 			checkTime(0.0f),    // 初始化 checkTime
+			IgnoreActors(),		// 初始化 TArray
 			lastStartPos(FVector::ZeroVector), // 初始化 lastStartPos
 			lastEndPos(FVector::ZeroVector)    // 初始化 lastEndPos
 		{
@@ -140,4 +141,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="HitTraceComponent")
 	void ActivateHitTrace(FHitTraceRunTime& HitTraceRunTime);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHitTraceDelegate OnHitDetected;
 };

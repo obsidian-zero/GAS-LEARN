@@ -127,8 +127,6 @@ void ADemoPlayerGASCharacterBase::PossessedBy(AController* NewController)
 		AddStartupEffects();
 
 		AddCharacterAbilities();
-		
-		AddStartActionGameplayAbilities();
 	}
 }
 
@@ -232,15 +230,6 @@ void ADemoPlayerGASCharacterBase::UseActionGameplayAbility(const FInputActionIns
 		UE_LOG(LogInput, Warning, TEXT("AbilitySystemComponent is not valid"));
 	}
 	
-}
-
-void ADemoPlayerGASCharacterBase::AddStartActionGameplayAbilities()
-{
-	for(TSubclassOf<UActionGameplayAbility> ActionAbility: StartActionGameplayAbilities)
-	{
-		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(ActionAbility, 1, 1, this));
-
-	}
 }
 
 bool ADemoPlayerGASCharacterBase::onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle)

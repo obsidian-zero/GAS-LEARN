@@ -65,7 +65,7 @@ void UHitTraceComponent::StartHitTraceByName(FString HitTraceTaskName)
 		{
 			
 			ActiveHitTraceTaskMap.Add(HitTraceTaskName, HitTraceTaskMap[HitTraceTaskName]);
-			ActivateHitTrace(HitTraceTaskMap[HitTraceTaskName]);
+			ActivateHitTrace(ActiveHitTraceTaskMap[HitTraceTaskName]);
 			if(ActiveHitTraceTaskMap.Num() > 0)
 			{
 				SetComponentTickEnabled(true);
@@ -127,9 +127,12 @@ void UHitTraceComponent::HitTrace(FHitTraceRunTime& HitTraceRunTime)
 		{
 			if(AActor * HitActor = HitResult.GetActor())
 			{
-				HitTraceRunTime.HitActors.Add(HitActor);
-				HitTraceRunTime.IgnoreActors.Add(HitActor);
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Actor: %s"), *HitActor->GetName()));
+				if(! HitTraceRunTime.HitActors.Contains(HitActor))
+				{
+					HitTraceRunTime.HitActors.Add(HitActor);
+					HitTraceRunTime.IgnoreActors.Add(HitActor);
+					OnHitDetected.Broadcast(HitResult, HitTraceRunTime.HitTraceTaskInfo.TaskName, HitActor);
+				}
 			}
 		}
 	}
@@ -148,6 +151,10 @@ void UHitTraceComponent::ActivateHitTrace_Implementation(FHitTraceRunTime& HitTr
 	HitTraceRunTime.lastStartPos = startPos;
 	HitTraceRunTime.lastEndPos = endPos;
 	HitTraceRunTime.checkTime = 0;
-	HitTraceRunTime.IgnoreActors = HitTraceRunTime.HitTraceTaskInfo.IgnoreActors;
+	HitTraceRunTime.IgnoreActors = TArray<AActor*>();
+	for(AActor* IgnoreActor : HitTraceRunTime.HitTraceTaskInfo.IgnoreActors)
+	{
+		HitTraceRunTime.IgnoreActors.Add(IgnoreActor);
+	}
 	HitTraceRunTime.HitActors.Reset();
 }

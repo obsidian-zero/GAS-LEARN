@@ -62,9 +62,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Demo|Input|Action")
 	TArray<UInputAction *> ActionIAs;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Meteor|Abilities")
-	TArray<TSubclassOf<UActionGameplayAbility>> StartActionGameplayAbilities;
-
 	TArray<TObjectPtr<UInputAction>> BindedInputActions;
 
 	void BindActionInputAction(TObjectPtr<UInputAction>);
@@ -123,8 +120,6 @@ public:
 	void MoveRight(float Value);
 
 	void UseActionGameplayAbility(const FInputActionInstance& Instance);
-
-	void AddStartActionGameplayAbilities();
 	
 	bool onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle);
 
