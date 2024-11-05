@@ -438,3 +438,37 @@ void ADemoPlayerGASCharacterBase::BindASCInput()
 		ASCInputBound = true;
 	}
 }
+
+void ADemoPlayerGASCharacterBase::GetCameraParam_Implementation(float& TpFov, float& FpFov, bool& RightShoulder)
+{
+	TpFov = CameraTpFov;
+	FpFov = CameraFpFov;
+	RightShoulder = CameraRightShoulder;
+}
+
+void ADemoPlayerGASCharacterBase::GetFPCameraTarget_Implementation(FVector& FpCameraTarget)
+{
+	FpCameraTarget = GetMesh()->GetSocketLocation(FName("FP_Camera"));
+}
+
+void ADemoPlayerGASCharacterBase::GetTPPivotTarget_Implementation(FTransform& TpCameraTarget)
+{
+	FVector Head = GetMesh()->GetSocketLocation(FName("Head"));
+	FVector Root = GetMesh()->GetSocketLocation(FName("Root"));
+
+	TpCameraTarget = FTransform(GetActorRotation(), (Head + Root) / 2.0f, FVector(1.0f));
+	
+}
+
+void ADemoPlayerGASCharacterBase::GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ETraceTypeQuery>& TraceChannel)
+{
+	if (CameraRightShoulder)
+	{
+		TraceOrigin = GetMesh()->GetSocketLocation(FName("TP_CameraTrace_R"));
+	}else
+	{
+		TraceOrigin = GetMesh()->GetSocketLocation(FName("TP_CameraTrace_L"));
+	}
+	TraceRadius = TPTraceRadius;
+	TraceChannel = TPTraceChannel;
+}
