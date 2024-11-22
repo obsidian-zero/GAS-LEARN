@@ -31,10 +31,10 @@ struct FCombatSignalDataTableRow : public FTableRowBase
 	FString FriendText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USoundBase* SelfSound;  
+	USoundBase* SelfSound = nullptr;  
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USoundBase* FriendSound;  
+	USoundBase* FriendSound = nullptr;  
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

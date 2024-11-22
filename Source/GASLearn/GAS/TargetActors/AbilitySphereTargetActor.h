@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
+#include "Engine/EngineTypes.h"
+#include "Engine/OverlapResult.h"
 #include "AbilitySphereTargetActor.generated.h"
 
 /**

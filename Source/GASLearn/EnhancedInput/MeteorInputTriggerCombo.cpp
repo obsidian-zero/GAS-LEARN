@@ -4,6 +4,76 @@
 #include "GASLearn/EnhancedInput/MeteorInputTriggerCombo.h"
 #include "EnhancedInputModule.h"
 #include "EnhancedPlayerInput.h"
+#include "InputTriggers.h"
+#include "Misc/DataValidation.h"
+
+#define LOCTEXT_NAMESPACE "EnhancedInputTriggers"
+
+UMeteorInputTriggerCombo::UMeteorInputTriggerCombo()
+{
+	bShouldAlwaysTick = true;
+}
+
+#if WITH_EDITOR
+EDataValidationResult UMeteorInputTriggerCombo::IsDataValid(FDataValidationContext& Context) const
+{
+	EDataValidationResult Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
+	
+	// You can't evaluate the combo if there are no combo steps!
+	if (ComboActions.IsEmpty())
+	{
+		Result = EDataValidationResult::Invalid;
+		Context.AddError(LOCTEXT("NoComboSteps", "There must be at least one combo step in the Combo Trigger!"));
+	}
+
+	// Making sure combo completion states have at least one state
+	for (const FInputComboStepData& ComboStep : ComboActions)
+	{
+		if (ComboStep.ComboStepCompletionStates == 0)
+		{
+			Result = EDataValidationResult::Invalid;
+			Context.AddError(FText::Format(LOCTEXT("NoCompletionStates", "There must be at least one completion state in ComboStep Completion States in the {0} combo step in order to progress the combo!"), FText::FromString(ComboStep.ComboStepAction.GetName())));
+		}
+	}
+
+	// Making sure cancellation states have at least one state
+	for (const FInputCancelAction& CancelAction : InputCancelActions)
+	{
+		if (CancelAction.CancellationStates == 0)
+		{
+			Result = EDataValidationResult::Invalid;
+			Context.AddError(FText::Format(LOCTEXT("NoCancellationStates", "There must be at least one cancellation state in Cancellation States in the {0} cancel action in order to cancel the combo!"), FText::FromString(CancelAction.CancelAction.GetName())));
+		}
+	}
+
+	return Result;
+}
+#endif // WITH_EDITOR
+
+void UMeteorInputTriggerCombo::PostLoad()
+{
+	Super::PostLoad();
+	
+	// start fix up in case it's an old version that just has the cancel input action
+#if WITH_EDITORONLY_DATA
+	PRAGMA_DISABLE_DEPRECATION_WARNINGS
+
+	if (!CancelActions.IsEmpty())
+	{
+		for (const TObjectPtr<const UInputAction>& InputAction : CancelActions)
+		{
+			// use default settings but set cancel action
+			FInputCancelAction InputCancelAction;
+			InputCancelAction.CancelAction = InputAction;
+			InputCancelActions.Add(InputCancelAction);
+		}
+		CancelActions.Empty();
+	}
+		
+	PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#endif // WITH_EDITORONLY_DATA
+}
+
 
 ETriggerState UMeteorInputTriggerCombo::UpdateState_Implementation(const UEnhancedPlayerInput* PlayerInput, FInputActionValue ModifiedValue, float DeltaTime)
 {
@@ -94,3 +164,5 @@ ETriggerState UMeteorInputTriggerCombo::UpdateState_Implementation(const UEnhanc
 	}
 	return ETriggerState::None;
 };
+
+#undef LOCTEXT_NAMESPACE
