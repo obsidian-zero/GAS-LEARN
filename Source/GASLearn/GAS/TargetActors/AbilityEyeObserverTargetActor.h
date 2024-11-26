@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
 #include "GameplayAbilities/Public/Abilities/GameplayAbility.h"
+#include "Engine/OverlapResult.h"
 #include "AbilityEyeObserverTargetActor.generated.h"
 
 /**
