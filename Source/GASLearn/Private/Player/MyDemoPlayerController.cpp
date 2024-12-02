@@ -4,6 +4,7 @@
 #include "Player/MyDemoPlayerController.h"
 #include "AbilitySystemComponent.h"
 #include "Player/MyPlayerState.h"
+#include "GASLearn/Camera/MeteorPlayerCameraManager.h"
 
 void AMyDemoPlayerController::OnPossess(APawn* InPawn)
 {
@@ -13,5 +14,9 @@ void AMyDemoPlayerController::OnPossess(APawn* InPawn)
 	if (PS)
 	{
 		PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, InPawn);
+	}
+	if(AMeteorPlayerCameraManager * CameraManager = Cast<AMeteorPlayerCameraManager>(PlayerCameraManager))
+	{
+		CameraManager->onPlayerControllerProcess(InPawn);
 	}
 }

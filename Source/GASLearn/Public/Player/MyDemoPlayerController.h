@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "MyDemoPlayerController.generated.h"
 
+class AMeteorPlayerCameraManager;
+
 /**
  * 
  */

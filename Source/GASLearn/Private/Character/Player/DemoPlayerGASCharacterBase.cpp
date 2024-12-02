@@ -18,13 +18,13 @@
 // Sets default values
 ADemoPlayerGASCharacterBase::ADemoPlayerGASCharacterBase(const class FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 70.0f));
+	// CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("CameraBoom"));
+	// CameraBoom->SetupAttachment(RootComponent);
+	// CameraBoom->bUsePawnControlRotation = true;
+	// CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 70.0f));
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(FName("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom);
+	FollowCamera->SetupAttachment(RootComponent);
 	FollowCamera->FieldOfView = 80.0f;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
@@ -43,8 +43,8 @@ void ADemoPlayerGASCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartingCameraBoomLength = CameraBoom->TargetArmLength;
-	StartingCameraBoomLocation = CameraBoom->GetRelativeLocation();
+	// StartingCameraBoomLength = CameraBoom->TargetArmLength;
+	// StartingCameraBoomLocation = CameraBoom->GetRelativeLocation();
 
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
