@@ -16,3 +16,4 @@ Content
 *.uasset
 /Source/GASLearn/Private/Input
 /Source/GASLearn/Public/Input
+/Plugins
