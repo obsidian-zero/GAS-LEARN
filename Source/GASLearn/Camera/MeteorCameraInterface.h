@@ -37,7 +37,7 @@ public:
 	virtual void GetTPPivotTarget_Implementation(FTransform &TpCameraTarget) = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "CameraSystem")
-	void GetTPTraceParams(FVector &TraceOrigin, float &TraceRadius, TEnumAsByte<ETraceTypeQuery> &TraceChannel);
-	virtual void GetTPTraceParams_Implementation(FVector &TraceOrigin, float &TraceRadius, TEnumAsByte<ETraceTypeQuery> &TraceChannel) = 0;
+	void GetTPTraceParams(FVector &TraceOrigin, float &TraceRadius, TEnumAsByte<ECollisionChannel> &TraceChannel);
+	virtual void GetTPTraceParams_Implementation(FVector &TraceOrigin, float &TraceRadius, TEnumAsByte<ECollisionChannel> &TraceChannel) = 0;
 	
 };

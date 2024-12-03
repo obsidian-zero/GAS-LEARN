@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "MeteorPlayerCameraManager.generated.h"
 
 class ADemoPlayerGASCharacterBase;
@@ -38,10 +39,11 @@ public:
 	bool CustomCameraBehavior(float DeltaTime, FVector& Location, FRotator& Rotation, float& FOV);
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")
-	static FVector CalculateLocationLagInWorld(FVector CurrentLocation, FVector TargetLocation, FRotator CameraRotation, FVector LagSpeeds, float DeltaTime);
+	static FVector CalculateLocationLagInCamera(FVector CurrentLocation, FVector TargetLocation, FRotator CameraRotation, FVector LagSpeeds, float DeltaTime);
 	
 	float GetAnimCurveValue(FName CurveName) const;
 
+	// 曲线命名
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
 	FName LagRotatorSpeedCurve;
 
@@ -57,6 +59,29 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
 	FName DebugOverrideCurve;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName PivotOffsetCurveX;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName PivotOffsetCurveY;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName PivotOffsetCurveZ;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName CameraOffsetCurveX;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName CameraOffsetCurveY;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName CameraOffsetCurveZ;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName TargetFPWeightCurve;
+	
+	// 曲线命名结束
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Info")
 	FVector RootLocation;
 
@@ -74,4 +99,14 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera|Debug")
     FRotator DebugViewRotation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera|Debug")
+	FVector DebugViewOffset;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Debug")
+	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera|Debug")
+	float DrawDebugTime;
 };

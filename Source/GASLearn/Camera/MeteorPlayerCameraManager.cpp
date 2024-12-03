@@ -65,11 +65,12 @@ void AMeteorPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, f
 		else
 		{
 			OutVT.Target->CalcCamera(DeltaTime, OutVT.POV);
+			
 		}
 	}
 }
 
-FVector AMeteorPlayerCameraManager::CalculateLocationLagInWorld(FVector CurrentLocation, FVector TargetLocation,
+FVector AMeteorPlayerCameraManager::CalculateLocationLagInCamera(FVector CurrentLocation, FVector TargetLocation,
 															 FRotator CameraRotation, FVector LagSpeeds,
 															 float DeltaTime)
 {
@@ -117,7 +118,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 													 GetAnimCurveValue(DebugOverrideCurve),
 													 true);
 
-	// 第三步，计算摄像机的位置，通过曲线反应的数据来混合具体的位置
+	// 第三步，计算摄像机的枢轴位置，通过曲线反应的数据来混合具体的位置
 	FVector LagSpeed(
 		GetAnimCurveValue(LagPivotSpeedCurveX),
 		GetAnimCurveValue(LagPivotSpeedCurveY),
@@ -125,18 +126,78 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 		);
 
 	// 对于摄像机的位置和目标位置，我们需要通过LagSpeed来计算一个差值(这里主要要转换到世界坐标下进行差值计算)
-	const FVector& AxisIndpLag = CalculateLocationLagInWorld(SmoothedPivotTarget.GetLocation(),
+	const FVector& AxisIndpLag = CalculateLocationLagInCamera(SmoothedPivotTarget.GetLocation(),
 															 PivotTarget.GetLocation() - FVector(100.0f, 0.0f, 0.0f),
 															 TargetCameraRotation,
 															 LagSpeed,
 															 DeltaTime);
 
+	// 将平滑后的位置和旋转保存到变量中
 	SmoothedPivotTarget.SetLocation(AxisIndpLag);
 	SmoothedPivotTarget.SetRotation(PivotTarget.GetRotation());
 	SmoothedPivotTarget.SetScale3D(FVector::OneVector);
 
+	// 第四步，计算目标枢轴位置
+	PivotLocation =
+		SmoothedPivotTarget.GetLocation() +
+		UKismetMathLibrary::GetForwardVector(SmoothedPivotTarget.Rotator()) * GetAnimCurveValue(
+			PivotOffsetCurveX) +
+		UKismetMathLibrary::GetRightVector(SmoothedPivotTarget.Rotator()) * GetAnimCurveValue(
+			PivotOffsetCurveY) +
+		UKismetMathLibrary::GetUpVector(SmoothedPivotTarget.Rotator()) * GetAnimCurveValue(
+			PivotOffsetCurveZ);
+
+	// 第五步，计算摄像机的位置
+	TargetCameraLocation = UKismetMathLibrary::VLerp(
+		PivotLocation
+		+UKismetMathLibrary::GetForwardVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveX)
+		+UKismetMathLibrary::GetRightVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveY)
+		+UKismetMathLibrary::GetUpVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveZ),
+		PivotTarget.GetLocation() + DebugViewOffset,
+		GetAnimCurveValue(DebugOverrideCurve));
+	
 	Location = AxisIndpLag;
 	Rotation = PivotTarget.GetRotation().Rotator();
+
+	// 第六步，根据碰撞计算摄像机的偏移位置
+	FVector TraceOrigin;
+	float TraceRadius;
+	TEnumAsByte<ECollisionChannel> TraceChannel;
+	ControlledPawn->Execute_GetTPTraceParams(ControlledPawn, TraceOrigin, TraceRadius, TraceChannel);
+
+	UWorld* World = GetWorld();
+	check(World);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(ControlledPawn);
+
+	FHitResult HitResult;
+	const FCollisionShape SphereCollisionShape = FCollisionShape::MakeSphere(TraceRadius);
+	const bool bHit = World->SweepSingleByChannel(HitResult, TraceOrigin, TargetCameraLocation, FQuat::Identity,
+												  TraceChannel, SphereCollisionShape, Params);
 	
+	if (HitResult.IsValidBlockingHit())
+	{
+		TargetCameraLocation += HitResult.Location - HitResult.TraceEnd;
+	}
+
+	// 第七步，混合第一人称和第三人称的摄像机整体变换以及FOV
+	FTransform TargetCameraTransform(TargetCameraRotation, TargetCameraLocation, FVector::OneVector);
+	FTransform FPTargetCameraTransform(TargetCameraRotation, FPTarget, FVector::OneVector);
+
+	const FTransform& MixedTransform = UKismetMathLibrary::TLerp(TargetCameraTransform, FPTargetCameraTransform,
+																 GetAnimCurveValue(
+																	 TargetFPWeightCurve));
+
+	const FTransform& TargetTransform = UKismetMathLibrary::TLerp(MixedTransform,
+																  FTransform(DebugViewRotation,
+																  TargetCameraLocation,
+																  FVector::OneVector),
+																  GetAnimCurveValue(DebugOverrideCurve));
+
+	Location = TargetTransform.GetLocation();
+	Rotation = TargetTransform.Rotator();
+	FOV = FMath::Lerp(TPFOV, FPFOV, GetAnimCurveValue(TargetFPWeightCurve));
 	return true;
 }

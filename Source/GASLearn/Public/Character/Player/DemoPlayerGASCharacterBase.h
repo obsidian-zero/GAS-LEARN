@@ -160,8 +160,8 @@ public:
 	float TPTraceRadius = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem")
-	TEnumAsByte<ETraceTypeQuery> TPTraceChannel;
+	TEnumAsByte<ECollisionChannel> TPTraceChannel;
 	
-	virtual void GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ETraceTypeQuery>& TraceChannel) override;
+	virtual void GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ECollisionChannel>& TraceChannel) override;
 
 };

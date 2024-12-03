@@ -460,7 +460,7 @@ void ADemoPlayerGASCharacterBase::GetTPPivotTarget_Implementation(FTransform& Tp
 	
 }
 
-void ADemoPlayerGASCharacterBase::GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ETraceTypeQuery>& TraceChannel)
+void ADemoPlayerGASCharacterBase::GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ECollisionChannel>& TraceChannel)
 {
 	if (CameraRightShoulder)
 	{
