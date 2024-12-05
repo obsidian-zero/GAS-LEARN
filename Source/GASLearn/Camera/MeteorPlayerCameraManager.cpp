@@ -6,6 +6,7 @@
 #include "GASLearn/Public/Character/Player/DemoPlayerGASCharacterBase.h"
 #include "GASLearn/Camera/MeteorCameraBehavior.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "DrawDebugHelpers.h"
 
 AMeteorPlayerCameraManager::AMeteorPlayerCameraManager()
 {
@@ -127,7 +128,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 
 	// 对于摄像机的位置和目标位置，我们需要通过LagSpeed来计算一个差值(这里主要要转换到世界坐标下进行差值计算)
 	const FVector& AxisIndpLag = CalculateLocationLagInCamera(SmoothedPivotTarget.GetLocation(),
-															 PivotTarget.GetLocation() - FVector(100.0f, 0.0f, 0.0f),
+															 PivotTarget.GetLocation(),
 															 TargetCameraRotation,
 															 LagSpeed,
 															 DeltaTime);
@@ -136,6 +137,10 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 	SmoothedPivotTarget.SetLocation(AxisIndpLag);
 	SmoothedPivotTarget.SetRotation(PivotTarget.GetRotation());
 	SmoothedPivotTarget.SetScale3D(FVector::OneVector);
+	if(DrawDebugHint)
+	{
+		DrawDebugSphere(GetWorld(), AxisIndpLag, 10.0f, 12, FColor::Green, false, 0.1f, 0, 1.0f);
+	}
 
 	// 第四步，计算目标枢轴位置
 	PivotLocation =
@@ -147,7 +152,11 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 		UKismetMathLibrary::GetUpVector(SmoothedPivotTarget.Rotator()) * GetAnimCurveValue(
 			PivotOffsetCurveZ);
 
-	// 第五步，计算摄像机的位置
+	if(DrawDebugHint)
+	{
+		DrawDebugSphere(GetWorld(), PivotLocation, 10.0f, 12, FColor::Red, false, 0.1f, 0, 1.0f);
+	}
+		// 第五步，计算摄像机的位置
 	TargetCameraLocation = UKismetMathLibrary::VLerp(
 		PivotLocation
 		+UKismetMathLibrary::GetForwardVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveX)
@@ -155,7 +164,9 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 		+UKismetMathLibrary::GetUpVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveZ),
 		PivotTarget.GetLocation() + DebugViewOffset,
 		GetAnimCurveValue(DebugOverrideCurve));
-	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, UKismetMathLibrary::GetForwardVector(TargetCameraRotation).ToString());
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TargetCameraLocation.ToString());
 	Location = AxisIndpLag;
 	Rotation = PivotTarget.GetRotation().Rotator();
 

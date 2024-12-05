@@ -109,4 +109,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera|Debug")
 	float DrawDebugTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera|Debug")
+	bool DrawDebugHint = false;
 };
