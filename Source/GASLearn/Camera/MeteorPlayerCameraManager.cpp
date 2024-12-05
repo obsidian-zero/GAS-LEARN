@@ -74,17 +74,17 @@ FVector AMeteorPlayerCameraManager::CalculateLocationLagInCamera(FVector Current
 															 FRotator CameraRotation, FVector LagSpeeds,
 															 float DeltaTime)
 {
-	CameraRotation.Roll = 0.0f;
-	CameraRotation.Pitch = 0.0f;
-	const FVector UnrotatedCurLoc = CameraRotation.UnrotateVector(CurrentLocation);
-	const FVector UnrotatedTargetLoc = CameraRotation.UnrotateVector(TargetLocation);
+	// CameraRotation.Roll = 0.0f;
+	// CameraRotation.Pitch = 0.0f;
+	// const FVector UnrotatedCurLoc = CameraRotation.UnrotateVector(CurrentLocation);
+	// const FVector UnrotatedTargetLoc = CameraRotation.UnrotateVector(TargetLocation);
 
-	const FVector ResultVector(
-		FMath::FInterpTo(UnrotatedCurLoc.X, UnrotatedTargetLoc.X, DeltaTime, LagSpeeds.X),
-		FMath::FInterpTo(UnrotatedCurLoc.Y, UnrotatedTargetLoc.Y, DeltaTime, LagSpeeds.Y),
-		FMath::FInterpTo(UnrotatedCurLoc.Z, UnrotatedTargetLoc.Z, DeltaTime, LagSpeeds.Z));
+	return FVector(
+		FMath::FInterpTo(CurrentLocation.X, TargetLocation.X, DeltaTime, LagSpeeds.X),
+		FMath::FInterpTo(CurrentLocation.Y, TargetLocation.Y, DeltaTime, LagSpeeds.Y),
+		FMath::FInterpTo(CurrentLocation.Z, TargetLocation.Z, DeltaTime, LagSpeeds.Z));
 
-	return CameraRotation.RotateVector(ResultVector);
+	// return CameraRotation.RotateVector(ResultVector);
 }
 
 bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& Location, FRotator& Rotation, float& FOV)
