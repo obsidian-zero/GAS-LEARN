@@ -79,6 +79,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
 	FName TargetFPWeightCurve;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName TraceIncreaseLagThresholdCurve;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Camera|Curve")
+	FName TraceIncreaseLagSpeedCurve;
 	
 	// 曲线命名结束
 	
@@ -96,6 +102,12 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Info")
 	FRotator TargetCameraRotation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Info")
+	float PreviousCameraLength = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Info")
+	bool InTraceLag = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera|Debug")
     FRotator DebugViewRotation;

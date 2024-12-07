@@ -139,7 +139,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 	SmoothedPivotTarget.SetScale3D(FVector::OneVector);
 	if(DrawDebugHint)
 	{
-		DrawDebugSphere(GetWorld(), AxisIndpLag, 10.0f, 12, FColor::Green, false, 0.1f, 0, 1.0f);
+		DrawDebugSphere(GetWorld(), AxisIndpLag, 10.0f, 36, FColor::Green, false, 0.1f, 0, 1.0f);
 	}
 
 	// 第四步，计算目标枢轴位置
@@ -154,7 +154,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 
 	if(DrawDebugHint)
 	{
-		DrawDebugSphere(GetWorld(), PivotLocation, 10.0f, 12, FColor::Red, false, 0.1f, 0, 1.0f);
+		DrawDebugSphere(GetWorld(), PivotLocation, 10.0f, 36, FColor::Red, false, 0.1f, 0, 1.0f);
 	}
 		// 第五步，计算摄像机的位置
 	TargetCameraLocation = UKismetMathLibrary::VLerp(
@@ -164,9 +164,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 		+UKismetMathLibrary::GetUpVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveZ),
 		PivotTarget.GetLocation() + DebugViewOffset,
 		GetAnimCurveValue(DebugOverrideCurve));
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, UKismetMathLibrary::GetForwardVector(TargetCameraRotation).ToString());
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TargetCameraLocation.ToString());
 	Location = AxisIndpLag;
 	Rotation = PivotTarget.GetRotation().Rotator();
 
@@ -187,11 +185,30 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 	const FCollisionShape SphereCollisionShape = FCollisionShape::MakeSphere(TraceRadius);
 	const bool bHit = World->SweepSingleByChannel(HitResult, TraceOrigin, TargetCameraLocation, FQuat::Identity,
 												  TraceChannel, SphereCollisionShape, Params);
-	
+
+	float dis = 0.0f;
 	if (HitResult.IsValidBlockingHit())
 	{
 		TargetCameraLocation += HitResult.Location - HitResult.TraceEnd;
 	}
+
+	dis = (TargetCameraLocation - TraceOrigin).Length();
+
+	if (dis - PreviousCameraLength > GetAnimCurveValue(TraceIncreaseLagThresholdCurve) || (InTraceLag && dis > PreviousCameraLength))
+	{
+		InTraceLag = true;
+		float alpha = DeltaTime * GetAnimCurveValue(TraceIncreaseLagSpeedCurve);
+		
+		FVector Direction = (TraceOrigin - TargetCameraLocation).GetSafeNormal(); // 计算朝向
+
+		FVector NewTargetLocation = TargetCameraLocation + Direction * (dis - PreviousCameraLength);
+		TargetCameraLocation = FMath::Lerp(NewTargetLocation, TargetCameraLocation, alpha);
+	}else
+	{
+		InTraceLag = false;
+	}
+
+	PreviousCameraLength = (TargetCameraLocation - TraceOrigin).Length();
 
 	// 第七步，混合第一人称和第三人称的摄像机整体变换以及FOV
 	FTransform TargetCameraTransform(TargetCameraRotation, TargetCameraLocation, FVector::OneVector);
