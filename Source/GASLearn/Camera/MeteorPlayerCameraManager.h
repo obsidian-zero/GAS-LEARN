@@ -36,6 +36,9 @@ public:
 	virtual void UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")
+	FVector PredictTPCameraTarget();
+	
+	UFUNCTION(BlueprintCallable, Category = "Camera")
 	bool CustomCameraBehavior(float DeltaTime, FVector& Location, FRotator& Rotation, float& FOV);
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")

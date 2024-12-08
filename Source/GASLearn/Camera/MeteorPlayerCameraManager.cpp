@@ -88,6 +88,41 @@ FVector AMeteorPlayerCameraManager::CalculateLocationLagInCamera(FVector Current
 	// return CameraRotation.RotateVector(ResultVector);
 }
 
+FVector AMeteorPlayerCameraManager::PredictTPCameraTarget()
+{
+	// 假定 PivotTarget 是从 ControlledPawn 的接口获取到的
+	FTransform PivotTarget;
+	ControlledPawn->Execute_GetTPPivotTarget(ControlledPawn, PivotTarget);
+
+	// 假定这些偏移曲线值已经在某处定义好（比如从动画曲线中获取或固定值）
+	float PivotOffsetX = GetAnimCurveValue(PivotOffsetCurveX);
+	float PivotOffsetY = GetAnimCurveValue(PivotOffsetCurveY);
+	float PivotOffsetZ = GetAnimCurveValue(PivotOffsetCurveZ);
+
+	float CameraOffsetX = GetAnimCurveValue(CameraOffsetCurveX);
+	float CameraOffsetY = GetAnimCurveValue(CameraOffsetCurveY);
+	float CameraOffsetZ = GetAnimCurveValue(CameraOffsetCurveZ);
+
+	// 获取 Controller 的旋转作为目标相机旋转
+	FRotator PredictTargetTPCameraRotation = GetOwningPlayerController()->GetControlRotation();
+
+	// 计算枢轴位置
+	FVector PredictPivotLocation = 
+		PivotTarget.GetLocation() +
+		UKismetMathLibrary::GetForwardVector(PivotTarget.Rotator()) * PivotOffsetX +
+		UKismetMathLibrary::GetRightVector(PivotTarget.Rotator()) * PivotOffsetY +
+		UKismetMathLibrary::GetUpVector(PivotTarget.Rotator()) * PivotOffsetZ;
+
+	// 计算相机位置
+	FVector PredictTargetCameraLocation = 
+		PredictPivotLocation +
+		UKismetMathLibrary::GetForwardVector(PredictTargetTPCameraRotation) * CameraOffsetX +
+		UKismetMathLibrary::GetRightVector(PredictTargetTPCameraRotation) * CameraOffsetY +
+		UKismetMathLibrary::GetUpVector(PredictTargetTPCameraRotation) * CameraOffsetZ;
+
+	return PredictTargetCameraLocation;
+}
+
 bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& Location, FRotator& Rotation, float& FOV)
 {
 	if(!IsValid(ControlledPawn))
@@ -156,7 +191,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 	{
 		DrawDebugSphere(GetWorld(), PivotLocation, 10.0f, 36, FColor::Red, false, 0.1f, 0, 1.0f);
 	}
-		// 第五步，计算摄像机的位置
+	// 第五步，计算摄像机的位置
 	TargetCameraLocation = UKismetMathLibrary::VLerp(
 		PivotLocation
 		+UKismetMathLibrary::GetForwardVector(TargetCameraRotation) * GetAnimCurveValue(CameraOffsetCurveX)
@@ -165,6 +200,12 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 		PivotTarget.GetLocation() + DebugViewOffset,
 		GetAnimCurveValue(DebugOverrideCurve));
 
+	FVector PredictTPCameraLocation = PredictTPCameraTarget();
+	if(DrawDebugHint)
+	{
+		DrawDebugSphere(GetWorld(), PredictTPCameraLocation, 10.0f, 36, FColor::Blue, false, 0.1f, 0, 1.0f);
+	}
+	
 	Location = AxisIndpLag;
 	Rotation = PivotTarget.GetRotation().Rotator();
 
@@ -194,7 +235,27 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 
 	dis = (TargetCameraLocation - TraceOrigin).Length();
 
-	if (dis - PreviousCameraLength > GetAnimCurveValue(TraceIncreaseLagThresholdCurve) || (InTraceLag && dis > PreviousCameraLength))
+	FHitResult PredictHitResult;
+	const bool predictHit = World->SweepSingleByChannel(PredictHitResult, TraceOrigin, PredictTPCameraLocation, FQuat::Identity,
+												  TraceChannel, SphereCollisionShape, Params);
+	float predictDistance = PreviousCameraLength;
+	if (PredictHitResult.IsValidBlockingHit())
+	{
+		PredictTPCameraLocation += PredictHitResult.Location - PredictHitResult.TraceEnd;
+		predictDistance = (PredictTPCameraLocation - TraceOrigin).Length();
+	}
+	if(predictHit && dis - predictDistance > GetAnimCurveValue(TraceIncreaseLagThresholdCurve))
+	{
+		// 插值调整 TargetCameraLocation，平滑移动以避免穿透
+		FVector AdjustDirection = (TraceOrigin - TargetCameraLocation).GetSafeNormal(); // 计算调整方向
+		FVector AdjustedLocation = TargetCameraLocation + AdjustDirection * (dis - predictDistance);
+		FVector NowLocation = TargetCameraLocation + AdjustDirection * (dis - PreviousCameraLength);
+		
+		// 插值函数，平滑过渡到新的位置
+		float alpha = DeltaTime * GetAnimCurveValue(TraceIncreaseLagSpeedCurve);
+		TargetCameraLocation = FMath::Lerp(NowLocation, AdjustedLocation, alpha);
+		
+	}else if (dis - PreviousCameraLength > GetAnimCurveValue(TraceIncreaseLagThresholdCurve) || (InTraceLag && dis > PreviousCameraLength))
 	{
 		InTraceLag = true;
 		float alpha = DeltaTime * GetAnimCurveValue(TraceIncreaseLagSpeedCurve);
@@ -207,7 +268,7 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 	{
 		InTraceLag = false;
 	}
-
+	
 	PreviousCameraLength = (TargetCameraLocation - TraceOrigin).Length();
 
 	// 第七步，混合第一人称和第三人称的摄像机整体变换以及FOV
