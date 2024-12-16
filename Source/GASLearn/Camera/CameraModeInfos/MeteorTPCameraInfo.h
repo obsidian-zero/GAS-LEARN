@@ -18,23 +18,19 @@ class GASLEARN_API UMeteorTPCameraInfo : public UMeteorCameraInfoBase
 
 public:
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "CameraSystem")
+	UFUNCTION(BlueprintCallable, Category = "CameraSystem")
 	void GetTPPivotTarget(FTransform &TpCameraTarget);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "CameraSystem")
+	UFUNCTION(BlueprintCallable, Category = "CameraSystem")
 	void GetTPTraceParams(FVector &TraceOrigin, float &TraceRadius, TEnumAsByte<ECollisionChannel> &TraceChannel);
+
+	virtual bool ActiveCameraInfo(AMeteorPlayerCameraManager* CameraManager) override;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CameraSystem|Info")
-	TObjectPtr<UMeteorTPCameraMode> TargetCameraMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem|Info")
-	TSubclassOf<UMeteorTPCameraMode> TargetCameraModeClass;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraSystem|Info")
 	FTransform SmoothedPivotTarget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraSystem|Info")
-	FVector TargetCameraTransform;
+	FVector TargetCameraLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraSystem|Info")
 	float PreviousCameraSpringLength = 0.0f;

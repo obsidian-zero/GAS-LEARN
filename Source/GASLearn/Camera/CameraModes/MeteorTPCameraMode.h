@@ -10,7 +10,7 @@ class UMeteorTPCameraInfo;
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class GASLEARN_API UMeteorTPCameraMode : public UMeteorCameraModeBase
 {
 	GENERATED_BODY()

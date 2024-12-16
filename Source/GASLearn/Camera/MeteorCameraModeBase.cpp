@@ -3,8 +3,14 @@
 
 #include "GASLearn/Camera/MeteorCameraModeBase.h"
 #include "GASLearn/Camera/MeteorCameraInfoBase.h"
+#include "GASLearn/Camera/MeteorPlayerCameraManager.h"
 
 
+bool UMeteorCameraModeBase::initCameraPlayerManager(TObjectPtr<AMeteorPlayerCameraManager> TargetCameraManager)
+{
+	this->CameraManager = TargetCameraManager;
+	return true;
+}
 
 bool UMeteorCameraModeBase::CustomCameraBehavior(UMeteorCameraInfoBase * CameraInfo, float DeltaTime, FVector& Location, FRotator& Rotation, float& FOV)
 {

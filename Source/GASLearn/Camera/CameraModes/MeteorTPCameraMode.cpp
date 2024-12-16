@@ -4,6 +4,7 @@
 #include "GASLearn/Camera/CameraModes/MeteorTPCameraMode.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GASLearn/Camera/CameraModeInfos/MeteorTPCameraInfo.h"
+#include "GASLearn/Camera/MeteorPlayerCameraManager.h"
 #include "DrawDebugHelpers.h"
 
 FVector UMeteorTPCameraMode::CalculateLocationLag(FVector CurrentLocation, FVector TargetLocation,
@@ -162,7 +163,7 @@ bool UMeteorTPCameraMode::CustomCameraBehavior(UMeteorCameraInfoBase * CameraInf
 	
 	if(DrawDebugInfo)
 	{
-		DrawDebugSphere(GetWorld(), AxisIndpLag, 10.0f, 36, FColor::Green, false, 0.1f, 0, 1.0f);
+		DrawDebugSphere(GetWorld(), AxisIndpLag, 10.0f, 36, FColor::Orange, false, 0.1f, 0, 1.0f);
 	}
 	
 	 FVector PivotLocation =
@@ -181,12 +182,25 @@ bool UMeteorTPCameraMode::CustomCameraBehavior(UMeteorCameraInfoBase * CameraInf
 		+UKismetMathLibrary::GetRightVector(TargetCameraRotation) * TPCameraInfo->CameraOffsetY
 		+UKismetMathLibrary::GetUpVector(TargetCameraRotation) * TPCameraInfo->CameraOffsetZ;
 
+	if(DrawDebugInfo)
+	{
+		DrawDebugSphere(GetWorld(), TargetCameraLocation, 10.0f, 36, FColor::Yellow, false, 0.1f, 0, 1.0f);
+	}
+	
 	FVector PredictTPCameraLocation = PredictTPCameraTarget(TPCameraInfo);
+
 	
 	Location = AxisIndpLag;
 	Rotation = PivotTarget.GetRotation().Rotator();
 	
 	ModifyCameraByTrace(TPCameraInfo, TargetCameraLocation, PredictTPCameraLocation, DeltaTime);
+
+	if(DrawDebugInfo)
+	{
+		DrawDebugSphere(GetWorld(), TargetCameraLocation, 10.0f, 36, FColor::Green, false, 0.1f, 0, 1.0f);
+	}
+
+	TPCameraInfo->TargetCameraLocation = TargetCameraLocation;
 	
 	Location = TargetCameraLocation;
 	Rotation = TargetCameraRotation;

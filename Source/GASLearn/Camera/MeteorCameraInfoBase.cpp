@@ -2,8 +2,14 @@
 
 
 #include "GASLearn/Camera/MeteorCameraInfoBase.h"
+#include "GASLearn/Camera/MeteorPlayerCameraManager.h"
 
-bool UMeteorCameraInfoBase::isCameraInfoValid_Implementation()
+bool UMeteorCameraInfoBase::isCameraInfoValid()
+{
+	return true;
+}
+
+bool UMeteorCameraInfoBase::ActiveCameraInfo(AMeteorPlayerCameraManager* CameraManager)
 {
 	return true;
 }

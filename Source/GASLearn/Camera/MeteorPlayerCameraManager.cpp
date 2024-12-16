@@ -7,6 +7,8 @@
 #include "GASLearn/Camera/MeteorCameraBehavior.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "GASLearn/Camera/MeteorCameraModeBase.h"
+#include "GASLearn/Camera/MeteorCameraInfoBase.h"
 
 AMeteorPlayerCameraManager::AMeteorPlayerCameraManager()
 {
@@ -17,14 +19,13 @@ AMeteorPlayerCameraManager::AMeteorPlayerCameraManager()
 
 void AMeteorPlayerCameraManager::onPlayerControllerProcess_Implementation(APawn* InPawn)
 {
-	// PlayerCameraManager需要知道当前控制的Pawn是什么，所以我们需要在这里保存一下
 	if(ControlledPawn = Cast<ADemoPlayerGASCharacterBase>(InPawn))
 	{
 		
 		ControlledPawn->Execute_GetTPPivotTarget(ControlledPawn, SmoothedPivotTarget);
 		SetActorLocation(SmoothedPivotTarget.GetLocation());
 	}
-
+	
 	if(IsValid(CameraMesh))
 	{
 		if(CameraBehavior = Cast<UMeteorCameraBehavior>(CameraMesh->GetAnimInstance()))
@@ -33,7 +34,52 @@ void AMeteorPlayerCameraManager::onPlayerControllerProcess_Implementation(APawn*
 			CameraBehavior->PlayerPawn = InPawn;
 		}
 	}
+	for(auto CameraInfo : CameraInfos)
+	{
+		if(IsValid(CameraInfo))
+		{
+			initCameraInfo(CameraInfo);
+		}
+	}
+	for(auto CameraInfo: CameraInfos)
+	{
+		if(IsValid(CameraInfo) && CameraInfo->isCameraInfoValid())
+		{
+			CurrentCameraInfo = CameraInfo;
+			CurrentCameraInfo->ActiveCameraInfo(this);
+			break;
+		}
+	}
 }
+
+TObjectPtr<UMeteorCameraModeBase> AMeteorPlayerCameraManager::FindOrCreateCameraMode(TSubclassOf<UMeteorCameraModeBase> CameraModeClass)
+{
+	for (auto CameraMode : CameraModes)
+	{
+		if(CameraMode->IsA(CameraModeClass))
+		{
+			return CameraMode;
+		}
+	}
+	TObjectPtr<UMeteorCameraModeBase> CameraModeInstance = NewObject<UMeteorCameraModeBase>(this, CameraModeClass);
+	
+	if (IsValid(CameraModeInstance))
+	{
+		CameraModeInstance->initCameraPlayerManager(this);
+	}
+	
+	return CameraModeInstance;
+}
+
+void AMeteorPlayerCameraManager::initCameraInfo(TObjectPtr<UMeteorCameraInfoBase> & CameraInfo)
+{
+	if(IsValid(CameraInfo))
+	{
+		TObjectPtr<UMeteorCameraModeBase> CameraMode = FindOrCreateCameraMode(CameraInfo->TargetCameraModeClass);
+		CameraInfo->TargetCameraMode = CameraMode;
+	}
+}
+
 
 float AMeteorPlayerCameraManager::GetAnimCurveValue(FName CurveName) const
 {
@@ -128,6 +174,10 @@ bool AMeteorPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& 
 	if(!IsValid(ControlledPawn))
 	{
 		return false;
+	}
+	if(IsValid(CurrentCameraInfo) && CurrentCameraInfo->isCameraInfoValid())
+	{
+		return CurrentCameraInfo->TargetCameraMode->CustomCameraBehavior(CurrentCameraInfo, DeltaTime, Location, Rotation, FOV);
 	}
 
 	// 第一步，通过接口获取到我们需要的摄像机上的一些信息

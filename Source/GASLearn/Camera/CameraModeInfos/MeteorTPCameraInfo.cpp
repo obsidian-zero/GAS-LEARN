@@ -2,10 +2,10 @@
 
 
 #include "GASLearn/Camera/CameraModeInfos/MeteorTPCameraInfo.h"
-
+#include "GASLearn/Camera/MeteorPlayerCameraManager.h"
 #include "GameFramework/Character.h"
 
-void UMeteorTPCameraInfo::GetTPPivotTarget_Implementation(FTransform &TpCameraTarget)
+void UMeteorTPCameraInfo::GetTPPivotTarget(FTransform &TpCameraTarget)
 {
 	if (!IsValid(TargetActor))
 	{
@@ -17,7 +17,7 @@ void UMeteorTPCameraInfo::GetTPPivotTarget_Implementation(FTransform &TpCameraTa
 	
 }
 
-void UMeteorTPCameraInfo::GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ECollisionChannel>& TraceChannel)
+void UMeteorTPCameraInfo::GetTPTraceParams(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ECollisionChannel>& TraceChannel)
 {
 	if (!IsValid(TargetActor))
 	{
@@ -32,4 +32,14 @@ void UMeteorTPCameraInfo::GetTPTraceParams_Implementation(FVector& TraceOrigin, 
 	}
 	TraceRadius = TPTraceRadius;
 	TraceChannel = TPTraceChannel;
+}
+
+bool UMeteorTPCameraInfo::ActiveCameraInfo(AMeteorPlayerCameraManager* CameraManager)
+{
+	TargetActor = Cast<ACharacter>(CameraManager->GetViewTarget());
+	if (!IsValid(TargetActor))
+	{
+		return false;
+	}
+	return true;
 }

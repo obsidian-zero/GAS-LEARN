@@ -9,6 +9,8 @@
 
 class ADemoPlayerGASCharacterBase;
 class UMeteorCameraBehavior;
+class UMeteorCameraInfoBase;
+class UMeteorCameraModeBase;
 /**
  * 
  */
@@ -20,6 +22,25 @@ class GASLEARN_API AMeteorPlayerCameraManager : public APlayerCameraManager
 	AMeteorPlayerCameraManager();
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSystem")
+	TArray<TObjectPtr<UMeteorCameraInfoBase>> CameraInfos;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSystem")
+	TArray<TObjectPtr<UMeteorCameraModeBase>> CameraModes;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSystem")
+	TObjectPtr<UMeteorCameraInfoBase> CurrentCameraInfo;
+
+	TObjectPtr<UMeteorCameraModeBase> FindOrCreateCameraMode(TSubclassOf<UMeteorCameraModeBase> CameraModeClass);
+
+	template<typename T>
+	TObjectPtr<T> FindOrCreateCameraMode(TSubclassOf<T> CameraModeClass)
+	{
+		return Cast<T>(FindOrCreateCameraMode(CameraModeClass));
+	}
+
+	void initCameraInfo(TObjectPtr<UMeteorCameraInfoBase> & CameraInfo);
+	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Camera")
 	TObjectPtr<ADemoPlayerGASCharacterBase> ControlledPawn;
 
