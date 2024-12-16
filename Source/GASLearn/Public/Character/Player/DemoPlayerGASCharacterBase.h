@@ -10,7 +10,6 @@
 #include "GASLearn/GAS/Ability/ActionGameplayAbility.h"
 #include "GASLearn/Public/Character/Abilities/CharacterGameplayAbility.h"
 #include "Templates/SharedPointer.h"
-#include "GASLearn/Camera/MeteorCameraInterface.h"
 #include "Engine/EngineTypes.h"
 
 #include "DemoPlayerGASCharacterBase.generated.h"
@@ -19,7 +18,7 @@
  * 
  */
 UCLASS()
-class GASLEARN_API ADemoPlayerGASCharacterBase : public AGASCharacterBase, public IMeteorCameraInterface
+class GASLEARN_API ADemoPlayerGASCharacterBase : public AGASCharacterBase
 {
 	GENERATED_BODY()
 public:
@@ -140,28 +139,4 @@ public:
 	void BindASCInput();
 
 	void InitializeStartingValues(AMyPlayerState* PS);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem")
-	float CameraTpFov = 90.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem")
-	float CameraFpFov = 90.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem")
-	bool CameraRightShoulder = true;
-	
-	virtual void GetCameraParam_Implementation(float& TpFov, float& FpFov, bool& RightShoulder) override;
-
-	virtual void GetFPCameraTarget_Implementation(FVector& FpCameraTarget) override;
-
-	virtual void GetTPPivotTarget_Implementation(FTransform& TpCameraTarget) override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem")
-	float TPTraceRadius = 10.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraSystem")
-	TEnumAsByte<ECollisionChannel> TPTraceChannel;
-	
-	virtual void GetTPTraceParams_Implementation(FVector& TraceOrigin, float& TraceRadius, TEnumAsByte<ECollisionChannel>& TraceChannel) override;
-
 };
