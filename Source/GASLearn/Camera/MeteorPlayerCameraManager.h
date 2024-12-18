@@ -22,7 +22,7 @@ class GASLEARN_API AMeteorPlayerCameraManager : public APlayerCameraManager
 	AMeteorPlayerCameraManager();
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSystem")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "CameraSystem")
 	TArray<TObjectPtr<UMeteorCameraInfoBase>> CameraInfos;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CameraSystem")

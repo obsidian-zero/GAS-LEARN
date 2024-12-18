@@ -12,8 +12,8 @@ class AMeteorPlayerCameraManager;
 /**
  * 
  */
-UCLASS(BlueprintType)
-class GASLEARN_API UMeteorCameraInfoBase : public UDataAsset
+UCLASS(BlueprintType, EditInlineNew)
+class GASLEARN_API UMeteorCameraInfoBase : public UObject
 {
 	GENERATED_BODY()
 	
