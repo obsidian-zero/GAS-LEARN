@@ -24,6 +24,11 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Trigger Settings")
 	float CurrentTimeIncomboTotal = 0.0f;
+
+	int32 SameBeginIANum = 1;
+	TArray<float> TimeForComboSteps;
+	TObjectPtr<const UInputAction> BeginInputAction;
+	
 	// Implicit, so action cannot fire unless this is firing.
 	virtual ETriggerType GetTriggerType_Implementation() const override { return ETriggerType::Implicit; }
 

@@ -72,6 +72,21 @@ void UMeteorInputTriggerCombo::PostLoad()
 		
 	PRAGMA_ENABLE_DEPRECATION_WARNINGS
 #endif // WITH_EDITORONLY_DATA
+
+	// 检查从开头是否有连续一样的IA
+	for (int32 i = 1; i < ComboActions.Num(); i++)
+	{
+		if (ComboActions[i].ComboStepAction == ComboActions[i - 1].ComboStepAction && ComboActions[i].ComboStepCompletionStates == ComboActions[i - 1].ComboStepCompletionStates)
+		{
+			SameBeginIANum = i + 1;
+		}
+		else
+		{
+			break;
+		}
+	}
+	BeginInputAction = ComboActions[0].ComboStepAction;
+	TimeForComboSteps.SetNum(SameBeginIANum);
 }
 
 
@@ -103,9 +118,26 @@ ETriggerState UMeteorInputTriggerCombo::UpdateState_Implementation(const UEnhanc
 				}
 			}
 		}
-		// loop through all combo actions and check if a combo action fired out of order
-		for (FInputComboStepData ComboStep : ComboActions)
+
+		int32 beginIndex = 0; //如果是前面重复的IA被重复输入了，那么相当于整体IA输入后延
+		if(CurrentComboStepIndex == SameBeginIANum)
 		{
+			const FInputActionInstance* BeginAction = PlayerInput->FindActionInstanceData(BeginInputAction);
+			if (BeginAction && (ComboActions[0].ComboStepCompletionStates & static_cast<uint8>(BeginAction->GetTriggerEvent())))
+			{
+				beginIndex = SameBeginIANum;
+				CurrentTimeBetweenComboSteps = 0;
+				CurrentTimeIncomboTotal -= TimeForComboSteps[0];
+				for(int32 i = 0; i < SameBeginIANum - 1; i++)
+				{
+					TimeForComboSteps[i] = TimeForComboSteps[i + 1];
+				}
+			}
+		}
+		
+		for (int32 i = beginIndex; i < ComboActions.Num(); i++)
+		{
+			const FInputComboStepData& ComboStep = ComboActions[i];
 			if (ComboStep.ComboStepAction && ComboStep.ComboStepAction != CurrentAction)
 			{
 				const FInputActionInstance* CancelState = PlayerInput->FindActionInstanceData(ComboStep.ComboStepAction);
@@ -115,12 +147,12 @@ ETriggerState UMeteorInputTriggerCombo::UpdateState_Implementation(const UEnhanc
 					// Other combo action firing - should cancel
 					CurrentComboStepIndex = 0;
 					CurrentTimeIncomboTotal = 0;
-					CurrentAction = ComboActions[CurrentComboStepIndex].ComboStepAction;	// Reset for fallthrough
+					CurrentAction = ComboActions[CurrentComboStepIndex].ComboStepAction;// Reset for fallthrough
 					break;
 				}
 			}
 		}
-
+		
 		// Reset if we take too long to hit the action
 		if (CurrentComboStepIndex > 0)
 		{
@@ -138,7 +170,13 @@ ETriggerState UMeteorInputTriggerCombo::UpdateState_Implementation(const UEnhanc
 		// check to see if current action is in one of it's completion states - if so advance the combo to the next combo action
 		if (CurrentState && (ComboActions[CurrentComboStepIndex].ComboStepCompletionStates & static_cast<uint8>(CurrentState->GetTriggerEvent())))
 		{
+			if (CurrentComboStepIndex > 0 && CurrentComboStepIndex <= SameBeginIANum)
+			{
+				TimeForComboSteps[CurrentComboStepIndex - 1] = CurrentTimeBetweenComboSteps;
+			}
+			
 			CurrentComboStepIndex++;
+
 			CurrentTimeBetweenComboSteps = 0;
 			// check to see if we've completed all actions in the combo
 			if (CurrentComboStepIndex >= ComboActions.Num())
