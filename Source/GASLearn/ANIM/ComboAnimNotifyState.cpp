@@ -2,6 +2,7 @@
 
 
 #include "GASLearn/ANIM/ComboAnimNotifyState.h"
+#include "GASLearn/EnhancedInput/MeteorAbilityInputComponent.h"
 
 void UComboAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
@@ -14,10 +15,12 @@ void UComboAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimS
 		UE_LOG(LogTemp, Warning, TEXT("Meteor AnimNS: OwnerActor is NULL"));
 		return;
 	}
-	
-	if(ADemoPlayerGASCharacterBase * Character = Cast<ADemoPlayerGASCharacterBase>(OwnerActor))
+
+	TObjectPtr<UMeteorAbilityInputComponent> AbilityInputComponent = OwnerActor->FindComponentByClass<UMeteorAbilityInputComponent>();	
+
+	if(AbilityInputComponent)
 	{
-		Character->ActiveActionGameplayAbilityComboInput(ActionGameplayAbility, ComboInputActions);
+		AbilityInputComponent->ActiveActionGameplayAbilityComboInput(ActionGameplayAbility, ComboInputActions);
 	}
 }
 
@@ -38,9 +41,11 @@ void UComboAnimNotifyState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSe
 		UE_LOG(LogTemp, Warning, TEXT("Meteor AnimNS: OwnerActor is NULL"));
 		return;
 	}
-	
-	if(ADemoPlayerGASCharacterBase * Character = Cast<ADemoPlayerGASCharacterBase>(OwnerActor))
+
+	TObjectPtr<UMeteorAbilityInputComponent> AbilityInputComponent = OwnerActor->FindComponentByClass<UMeteorAbilityInputComponent>();	
+
+	if(AbilityInputComponent)
 	{
-		Character->DeActiveActionGameplayAbilityComboInput(ActionGameplayAbility, ComboInputActions);
+		AbilityInputComponent->DeActiveActionGameplayAbilityComboInput(ActionGameplayAbility, ComboInputActions);
 	}
 }

@@ -4,6 +4,7 @@
 #include "Character/Player/DemoPlayerGASCharacterBase.h"
 
 #include "GameFramework/SpringArmComponent.h"
+#include "GASLearn/EnhancedInput/MeteorAbilityInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GASLearn/GASLearn.h"
@@ -22,7 +23,8 @@ ADemoPlayerGASCharacterBase::ADemoPlayerGASCharacterBase(const class FObjectInit
 	// CameraBoom->SetupAttachment(RootComponent);
 	// CameraBoom->bUsePawnControlRotation = true;
 	// CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 70.0f));
-
+	MeteorInputComponent = CreateDefaultSubobject<UMeteorAbilityInputComponent>(FName("MeteorInputComponent"));
+	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(FName("FollowCamera"));
 	FollowCamera->SetupAttachment(RootComponent);
 	FollowCamera->FieldOfView = 80.0f;
@@ -35,8 +37,6 @@ ADemoPlayerGASCharacterBase::ADemoPlayerGASCharacterBase(const class FObjectInit
 
 	AIControllerClass = APlayerController::StaticClass();
 	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
-
-	OnActionTag = FGameplayTag::RequestGameplayTag(FName("SpecialTag.ActionState.OnAction"));
 }
 
 void ADemoPlayerGASCharacterBase::BeginPlay()
@@ -70,8 +70,7 @@ void ADemoPlayerGASCharacterBase::SetupPlayerInputComponent(UInputComponent* Pla
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		UE_LOG(LogInput, Warning, TEXT("USING ENHANCED INPUT COMPONENT"));
-
-		BindEnhancedInputComponent = EnhancedInputComponent;
+		
 		//Jumping
 		EnhancedInputComponent->BindAction(JumpAction.Get(), ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction.Get(), ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -85,34 +84,9 @@ void ADemoPlayerGASCharacterBase::SetupPlayerInputComponent(UInputComponent* Pla
 		//Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ADemoPlayerGASCharacterBase::Interact);
 
-		for(UInputAction * IA: ActionIAs)
-		{
-
-			BindActionInputAction(IA);
-		}
-
-		for (TPair<TSubclassOf<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>>& Pair : ActionAbilityToInputActionMap)
-		{
-			for(TObjectPtr<UInputAction> IA: Pair.Value)
-			{
-				BindActionInputAction(IA);
-			}
-		}
-
+		MeteorInputComponent.Get()->BindInputComponent(EnhancedInputComponent);
 		
-	}else
-	{
-		PlayerInputComponent->BindAxis("MoveForward", this, &ADemoPlayerGASCharacterBase::MoveForward);
-		PlayerInputComponent->BindAxis("MoveRight", this, &ADemoPlayerGASCharacterBase::MoveRight);
-		PlayerInputComponent->BindAxis("LookUp", this, &ADemoPlayerGASCharacterBase::LookUp);
-		PlayerInputComponent->BindAxis("LookUpRate", this, &ADemoPlayerGASCharacterBase::LookUpRate);
-		PlayerInputComponent->BindAxis("Turn", this, &ADemoPlayerGASCharacterBase::Turn);
-		PlayerInputComponent->BindAxis("TurnRate", this, &ADemoPlayerGASCharacterBase::TurnRate);
 	}
-	
-	
-
-	BindASCInput();
 }
 
 void ADemoPlayerGASCharacterBase::PossessedBy(AController* NewController)
@@ -138,16 +112,6 @@ USpringArmComponent* ADemoPlayerGASCharacterBase::GetCameraBoom() const
 UCameraComponent* ADemoPlayerGASCharacterBase::GetFollowCamera() const
 {
 	return FollowCamera;
-}
-
-float ADemoPlayerGASCharacterBase::getStartingCameraBoomArmLength()
-{
-	return StartingCameraBoomLength;
-}
-
-FVector ADemoPlayerGASCharacterBase::getStartingCameraBoomLocation()
-{
-	return StartingCameraBoomLocation;
 }
 
 void ADemoPlayerGASCharacterBase::LookUp(float Value)
@@ -192,167 +156,6 @@ void ADemoPlayerGASCharacterBase::MoveRight(float Value)
 	AddMovementInput(UKismetMathLibrary::GetRightVector(FRotator(0.0f, GetControlRotation().Yaw, 0.0f)), Value);
 }
 
-void ADemoPlayerGASCharacterBase::UseActionGameplayAbility(const FInputActionInstance& InputInstance)
-{
-	const UInputAction* Action = InputInstance.GetSourceAction();
-	if (AbilitySystemComponent.IsValid())
-	{
-		if(AbilitySystemComponent->HasMatchingGameplayTag(OnActionTag))
-		{
-			FGameplayAbilitySpecHandle * comboSpec = InputActionToComboAbilityMap.Find(Action);
-			if (comboSpec)
-			{
-				AbilitySystemComponent->TryActivateAbility(*comboSpec, true);
-			}
-		}
-		else
-		{
-			FGameplayAbilitySpecHandle * basicSpec = InputActionToBasicAbilityMap.Find(Action);
-			if (basicSpec)
-			{
-				AbilitySystemComponent->TryActivateAbility(*basicSpec, true);
-			}else
-			{
-				UE_LOG(LogInput, Warning, TEXT("InputActionToAbilityMap does not contain %s"), *Action->GetFName().ToString());
-			}
-		}
-
-		if (InputActionToAlwaysAbilityMap.Contains(Action))
-		{
-			FGameplayAbilitySpecHandle * alwaysSpec = InputActionToAlwaysAbilityMap.Find(Action);
-			if (alwaysSpec)
-			{
-				AbilitySystemComponent->TryActivateAbility(*alwaysSpec, true);
-			}
-		}
-	}else
-	{
-		UE_LOG(LogInput, Warning, TEXT("AbilitySystemComponent is not valid"));
-	}
-	
-}
-
-bool ADemoPlayerGASCharacterBase::onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle)
-{
-	if (Ability && GetLocalRole() == ROLE_Authority && AbilitySystemComponent.IsValid())
-	{
-	
-		ActionAbilityToSpec.Add(Ability, AbilitySpecHandle);
-
-		TArray<TObjectPtr<UInputAction>> AbilityInputActions;
-		
-		for(UInputAction * IA: Ability->GetDefaultObject<UActionGameplayAbility>()->BasicInputActions)
-		{
-			BindActionInputAction(IA);
-			
-			if(!InputActionToBasicAbilityMap.Contains(IA))
-			{
-				InputActionToBasicAbilityMap.Add(IA, AbilitySpecHandle);
-			}else
-			{
-				FString basicName = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilitySpecHandle)->Ability.GetName();
-				UE_LOG(LogInput, Warning, TEXT("InputActionToBasicAbilityMap already contains action %s, ability: %s when add ability: %s"), *IA->GetName(), *basicName, *Ability->GetName());
-			}
-			AbilityInputActions.Add(IA);
-		}
-
-		for (UInputAction * IA: Ability->GetDefaultObject<UActionGameplayAbility>()->ComboInputActions)
-		{
-			BindActionInputAction(IA);
-			AbilityInputActions.Add(IA);
-		}
-
-		for (UInputAction * IA: Ability->GetDefaultObject<UActionGameplayAbility>()->AlwaysInputActions)
-		{
-			BindActionInputAction(IA);
-
-			if(!InputActionToAlwaysAbilityMap.Contains(IA))
-			{
-				InputActionToAlwaysAbilityMap.Add(IA, AbilitySpecHandle);
-			}else
-			{
-				FString basicName = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilitySpecHandle)->Ability.GetName();
-				UE_LOG(LogInput, Warning, TEXT("InputActionToAlwaysAbilityMap already contains action %s, ability: %s when add ability: %s"), *IA->GetName(), *basicName, *Ability->GetName());
-			}
-			AbilityInputActions.Add(IA);
-		}
-
-		ActionAbilityToInputActionMap.Add(Ability, AbilityInputActions);
-
-		return true;
-	}
-
-	return false;
-}
-
-void ADemoPlayerGASCharacterBase::DeActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility> Ability, TArray<UInputAction*> InputActions)
-{
-	if (ActionAbilityToSpec.Contains(Ability))
-	{
-		FGameplayAbilitySpecHandle AbilitySpecHandle = ActionAbilityToSpec[Ability];
-		
-		for(UInputAction * InputAction: InputActions)
-		{
-			if(InputActionToComboAbilityMap.Find(InputAction))
-			{
-				if (InputActionToComboAbilityMap[InputAction] != AbilitySpecHandle)
-				{
-					UE_LOG(LogInput, Warning, TEXT("InputActionToBasicAbilityMap already contains action %s, ability: %s"), *InputAction->GetName(), *Ability->GetName());
-				}else
-				{
-					InputActionToComboAbilityMap.Remove(InputAction);
-				}
-			}
-			else
-			{
-				UE_LOG(LogInput, Warning, TEXT("InputActionToBasicAbilityMap not contains action %s, ability: %s"), *InputAction->GetName(), *Ability->GetName());
-			}
-		}
-	}else
-	{
-		UE_LOG(LogInput, Warning, TEXT("ActionAbilityToSpec does not contain ability %s"), *Ability->GetName());
-	}
-}
-
-void ADemoPlayerGASCharacterBase::ActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility>Ability, TArray<UInputAction*> InputActions)
-{
-	if (ActionAbilityToSpec.Contains(Ability))
-	{
-		FGameplayAbilitySpecHandle AbilitySpecHandle = ActionAbilityToSpec[Ability];
-		
-		for(UInputAction * InputAction: InputActions)
-		{
-			if(! BindedInputActions.Contains(InputAction))
-			{
-				
-			}
-			
-			if(!InputActionToComboAbilityMap.Find(InputAction))
-			{
-				InputActionToComboAbilityMap.Add(InputAction, AbilitySpecHandle);
-			}
-			else
-			{
-				UE_LOG(LogInput, Warning, TEXT("InputActionToBasicAbilityMap already contains action %s, ability: %s"), *InputAction->GetName(), *Ability->GetName());
-			}
-		}
-	}else
-	{
-		UE_LOG(LogInput, Warning, TEXT("ActionAbilityToSpec does not contain ability %s"), *Ability->GetName());
-	}
-}
-
-void ADemoPlayerGASCharacterBase::BindActionInputAction(TObjectPtr<UInputAction> IA)
-{
-	if(!BindedInputActions.Contains(IA) && BindEnhancedInputComponent)
-	{
-		BindEnhancedInputComponent->BindAction(IA, ETriggerEvent::Completed, this, &ADemoPlayerGASCharacterBase::UseActionGameplayAbility);
-		
-		BindedInputActions.Add(IA);
-	}
-}
-
-
 void ADemoPlayerGASCharacterBase::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -361,9 +164,6 @@ void ADemoPlayerGASCharacterBase::OnRep_PlayerState()
 	if (PS)
 	{
 		InitializeStartingValues(PS);
-		
-		BindASCInput();
-		
 	}
 }
 
@@ -371,6 +171,8 @@ void ADemoPlayerGASCharacterBase::InitializeStartingValues(AMyPlayerState* PS)
 {
 	AbilitySystemComponent = Cast<UCharacterAbilitySystemComponent>(PS->GetAbilitySystemComponent());
 
+	MeteorInputComponent->AbilitySystemComponent = AbilitySystemComponent;
+	
 	PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
 
 	AttributeSetBase = PS->GetAttributeSetBase();
@@ -426,15 +228,4 @@ void ADemoPlayerGASCharacterBase::Interact(const FInputActionValue& Value)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact!"));
 	}
 
-}
-
-void ADemoPlayerGASCharacterBase::BindASCInput()
-{
-	if (!ASCInputBound && AbilitySystemComponent.IsValid() && IsValid(InputComponent))
-	{
-		const FTopLevelAssetPath AbilityEnumAssetPath = FTopLevelAssetPath(FName("/Script/GASLearn"), FName("EDemoAbilityID"));
-		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent,
-			FGameplayAbilityInputBinds(FString("ConfirmTarget"),FString("CancelTarget"), AbilityEnumAssetPath, static_cast<int32>(EDemoAbilityID::Confirm), static_cast<int32>(EDemoAbilityID::Cancel)));
-		ASCInputBound = true;
-	}
 }

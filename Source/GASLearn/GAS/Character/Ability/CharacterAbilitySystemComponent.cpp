@@ -2,6 +2,7 @@
 
 
 #include "CharacterAbilitySystemComponent.h"
+#include "GASLearn/EnhancedInput/MeteorAbilityInputComponent.h"
 
 void UCharacterAbilitySystemComponent::ReceiveDamage(UCharacterAbilitySystemComponent* SourceASC, float UnmitigatedDamage, float MitigatedDamage)
 {
@@ -14,9 +15,10 @@ void UCharacterAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Abili
 
 	if (UActionGameplayAbility* Ability = Cast<UActionGameplayAbility>(AbilitySpec.Ability))
 	{
-		if(ADemoPlayerGASCharacterBase* character = Cast<ADemoPlayerGASCharacterBase>(GetAvatarActor()))
+		TObjectPtr<UMeteorAbilityInputComponent> AbilityInputComponent = GetAvatarActor()->FindComponentByClass<UMeteorAbilityInputComponent>();	
+		if (AbilityInputComponent)
 		{
-			character->onAddActionGameplayAbility(Ability->GetClass(), AbilitySpec.Handle);
+			AbilityInputComponent->onAddActionGameplayAbility(Ability->GetClass(), AbilitySpec.Handle);
 		}
 		
 	}
