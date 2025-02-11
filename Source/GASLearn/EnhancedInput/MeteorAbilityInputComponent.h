@@ -37,6 +37,12 @@ public:
 
 	bool onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle);
 
+	UFUNCTION()
+	void onBeforeEvaluateInputDelegates();
+
+	UFUNCTION()
+	void onAfterEvaluateInputDelegates();
+	
 	TWeakObjectPtr<class UAbilitySystemComponent> AbilitySystemComponent;
 	
 	TArray<TObjectPtr<UInputAction>> BindedInputActions;
@@ -44,12 +50,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	FGameplayTag OnActionTag;
 	
-	TMap<UInputAction*, FGameplayAbilitySpecHandle> InputActionToBasicAbilityMap;
-	TMap<UInputAction*, FGameplayAbilitySpecHandle> InputActionToComboAbilityMap;
-	TMap<UInputAction*, FGameplayAbilitySpecHandle> InputActionToAlwaysAbilityMap;
+	TMap<TWeakObjectPtr<UInputAction>, FGameplayAbilitySpecHandle> InputActionToBasicAbilityMap;
+	TMap<TWeakObjectPtr<UInputAction>, FGameplayAbilitySpecHandle> InputActionToComboAbilityMap;
+	TMap<TWeakObjectPtr<UInputAction>, FGameplayAbilitySpecHandle> InputActionToAlwaysAbilityMap;
 	TMap<TSubclassOf<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>> ActionAbilityToInputActionMap;
 	TMap<TSubclassOf<UActionGameplayAbility>, FGameplayAbilitySpecHandle> ActionAbilityToSpec;
-
+	
 	TWeakObjectPtr<UEnhancedInputComponent> BindedEnhancedInputComponent;
 	
 };

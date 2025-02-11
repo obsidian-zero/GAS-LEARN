@@ -4,6 +4,8 @@
 #include "EnhancedInputComponent.h"
 #include "AbilitySystemComponent.h"
 #include "GASLearn/GAS/Ability/ActionGameplayAbility.h"
+#include "GASLearn/EnhancedInput/MeteorEnhancedPlayerInput.h"
+#include "GameFramework/Character.h"
 #include "InputAction.h"
 #include "GameplayTagContainer.h"
 #include "Engine/Engine.h"
@@ -26,6 +28,18 @@ bool UMeteorAbilityInputComponent::BindInputComponent(TObjectPtr<UEnhancedInputC
             for(TObjectPtr<UInputAction> IA: Pair.Value)
             {
                 BindActionInputAction(IA);
+            }
+        }
+
+        if(TObjectPtr<ACharacter> Owner = Cast<ACharacter>(GetOwner()))
+        {
+            if(TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(Owner->Controller))
+            {
+                if(TObjectPtr<UMeteorEnhancedPlayerInput> EnhancedPlayerInput = Cast<UMeteorEnhancedPlayerInput>(PlayerController->PlayerInput))
+                {
+                    EnhancedPlayerInput->OnBeforeEvaluateInputDelegates.AddDynamic(this, &UMeteorAbilityInputComponent::onBeforeEvaluateInputDelegates);
+                    EnhancedPlayerInput->OnAfterEvaluateInputDelegates.AddDynamic(this, &UMeteorAbilityInputComponent::onAfterEvaluateInputDelegates);
+                }
             }
         }
         return true;
@@ -196,4 +210,20 @@ bool UMeteorAbilityInputComponent::onAddActionGameplayAbility(TSubclassOf<UActio
     }
 
     return false;
+}
+
+void UMeteorAbilityInputComponent::onBeforeEvaluateInputDelegates()
+{
+    // if(GEngine)
+    // {
+    //     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("onBeforeEvaluateInputDelegates"));
+    // }
+}
+
+void UMeteorAbilityInputComponent::onAfterEvaluateInputDelegates()
+{
+    if(GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("onAfterEvaluateInputDelegates"));
+    }
 }

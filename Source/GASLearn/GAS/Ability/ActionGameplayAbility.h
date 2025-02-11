@@ -29,5 +29,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ActionInfo", meta = (AllowPrivateAccess = "true", ToolTip = "这些操作时在其他动作时会尝试激活技能"))
 	TArray<UInputAction*> ComboInputActions;
 
-	void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+	//** 技能的输入优先级 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActionInfo")
+	int32 InputPriority;
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	virtual int32 GetInputPriority() const { return InputPriority; }
 };
