@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GASLearn/ANIM/MeteorAnimNotifyStateBase.h"
+#include "GASLearn/AnimNotifyStates/MeteorAnimNotifyStateBase.h"
 
 FString UMeteorAnimNotifyStateBase::GetNotifyName_Implementation() const
 {

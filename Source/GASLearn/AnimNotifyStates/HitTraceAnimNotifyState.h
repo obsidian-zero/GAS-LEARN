@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GASLearn/ANIM/MeteorAnimNotifyStateBase.h"
+#include "GASLearn/AnimNotifyStates/MeteorAnimNotifyStateBase.h"
 #include "GASLearn/HitTraceComponent/HitTraceComponent.h"
 #include "HitTraceAnimNotifyState.generated.h"
 

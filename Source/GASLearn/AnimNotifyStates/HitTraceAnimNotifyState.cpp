@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GASLearn/ANIM/HitTraceAnimNotifyState.h"
+#include "GASLearn/AnimNotifyStates/HitTraceAnimNotifyState.h"
 
 void UHitTraceAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GASLearn/ANIM/GameplayEffectAnimNotifyState.h"
+#include "GASLearn/AnimNotifyStates/GameplayEffectAnimNotifyState.h"
 
 UGameplayEffectAnimNotifyState::UGameplayEffectAnimNotifyState()
 {

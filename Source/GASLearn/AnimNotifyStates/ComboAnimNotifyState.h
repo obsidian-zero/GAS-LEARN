@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InputAction.h"
-#include "GASLearn/ANIM/MeteorAnimNotifyStateBase.h"
+#include "GASLearn/AnimNotifyStates/MeteorAnimNotifyStateBase.h"
 #include "ComboAnimNotifyState.generated.h"
 
 class UActionGameplayAbility;

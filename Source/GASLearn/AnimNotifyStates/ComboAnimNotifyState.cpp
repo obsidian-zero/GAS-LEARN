@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GASLearn/ANIM/ComboAnimNotifyState.h"
+#include "GASLearn/AnimNotifyStates/ComboAnimNotifyState.h"
 #include "GASLearn/GAS/Ability/ActionGameplayAbility.h"
 #include "GASLearn/EnhancedInput/MeteorAbilityInputComponent.h"
 
