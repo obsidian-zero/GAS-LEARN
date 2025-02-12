@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GASLearn/ANIM/MeteorAnimNSGameplayEffect.h"
+#include "GASLearn/ANIM/GameplayEffectAnimNotifyState.h"
 
-UMeteorAnimNSGameplayEffect::UMeteorAnimNSGameplayEffect()
+UGameplayEffectAnimNotifyState::UGameplayEffectAnimNotifyState()
 {
 }
 
-void UMeteorAnimNSGameplayEffect::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
+void UGameplayEffectAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 
@@ -41,20 +41,12 @@ void UMeteorAnimNSGameplayEffect::NotifyBegin(USkeletalMeshComponent* MeshComp, 
 }
 
 
-void UMeteorAnimNSGameplayEffect::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
+void UGameplayEffectAnimNotifyState::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
 	AActor* OwnerActor = MeshComp->GetOwner();
-
 }
 
-FString UMeteorAnimNSGameplayEffect::GetNotifyName_Implementation() const
-{
-	FString DisplayName = TEXT("GameplayEffect");
-	
-	return DisplayName;
-}
-
-void UMeteorAnimNSGameplayEffect::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UGameplayEffectAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
@@ -69,10 +61,8 @@ void UMeteorAnimNSGameplayEffect::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
 	// 使用 IAbilitySystemInterface 接口检查 Actor 是否具备 AbilitySystemComponent
 	if (IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(OwnerActor))
 	{
-		UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
-		if (AbilitySystemComponent)
+		if (UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent())
 		{
-			
 			for(TSubclassOf<UGameplayEffect> GameplayEffect : StateEffects)
 			{
 				AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(GameplayEffect, AbilitySystemComponent, -1);
@@ -82,7 +72,7 @@ void UMeteorAnimNSGameplayEffect::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
 }
 
 #if WITH_EDITOR
-bool UMeteorAnimNSGameplayEffect::CanBePlaced(UAnimSequenceBase* Animation) const
+bool UGameplayEffectAnimNotifyState::CanBePlaced(UAnimSequenceBase* Animation) const
 {
 	return (Animation && Animation->IsA(UAnimMontage::StaticClass()));
 }

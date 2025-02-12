@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputAction.h"
 #include "GASLearn/ANIM/MeteorAnimNotifyStateBase.h"
 #include "ComboAnimNotifyState.generated.h"
 
-/**
- * 
- */
+class UActionGameplayAbility;
 UCLASS()
 class GASLEARN_API UComboAnimNotifyState : public UMeteorAnimNotifyStateBase
 {
@@ -19,12 +18,11 @@ public:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, const FAnimNotifyEventReference& EventReference) override;
 
-	FString GetNotifyName_Implementation() const override;
+	virtual FString GetNotifyName_Implementation() const override;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Combo")
 	TArray<UInputAction *> ComboInputActions;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Combo")
 	TSubclassOf<UActionGameplayAbility> ActionGameplayAbility;
-	
 };

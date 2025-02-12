@@ -7,24 +7,24 @@
 #include "GameplayEffect.h"
 #include "GASLearn/GAS/Character/Ability/CharacterAbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "MeteorAnimNSGameplayEffect.generated.h"
+#include "GameplayEffectAnimNotifyState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GASLEARN_API UMeteorAnimNSGameplayEffect : public UMeteorAnimNotifyStateBase
+class GASLEARN_API UGameplayEffectAnimNotifyState : public UMeteorAnimNotifyStateBase
 {
 	GENERATED_BODY()
 
 public:
-	UMeteorAnimNSGameplayEffect();
+	UGameplayEffectAnimNotifyState();
 	
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
-	FString GetNotifyName_Implementation() const override;
+	
 
 #if WITH_EDITOR
 	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const override;
@@ -34,4 +34,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Meteor|Effect")
 	TArray<TSubclassOf<class UGameplayEffect>> StateEffects;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Meteor")
+	FString EffectName = "GameplayEffectANS";
 };

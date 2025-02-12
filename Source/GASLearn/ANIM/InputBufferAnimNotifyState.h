@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GASLearn/ANIM/MeteorAnimNotifyStateBase.h"
-#include "InputBufferAnimNotifyStateBase.generated.h"
+#include "InputBufferAnimNotifyState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GASLEARN_API UInputBufferAnimNotifyStateBase : public UMeteorAnimNotifyStateBase
+class GASLEARN_API UInputBufferAnimNotifyState : public UMeteorAnimNotifyStateBase
 {
 	GENERATED_BODY()
 	

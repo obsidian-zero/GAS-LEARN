@@ -2,6 +2,7 @@
 
 
 #include "GASLearn/ANIM/ComboAnimNotifyState.h"
+#include "GASLearn/GAS/Ability/ActionGameplayAbility.h"
 #include "GASLearn/EnhancedInput/MeteorAbilityInputComponent.h"
 
 void UComboAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
@@ -26,7 +27,10 @@ void UComboAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimS
 
 FString UComboAnimNotifyState::GetNotifyName_Implementation() const
 {
-	
+	if(NotifyName != MeteorAnimNotifyStateBaseName)
+	{
+		return NotifyName;
+	}
 	return FString::Printf(TEXT("ComboGA: %s"), *ActionGameplayAbility->GetName());
 }
 
