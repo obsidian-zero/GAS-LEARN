@@ -23,7 +23,7 @@ bool UMeteorAbilityInputComponent::BindInputComponent(TObjectPtr<UEnhancedInputC
     {
         BindedEnhancedInputComponent = EIC;
 
-        for (TPair<TSubclassOf<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>>& Pair : ActionAbilityToInputActionMap)
+        for (TPair<TObjectPtr<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>>& Pair : ActionAbilityToInputActionMap)
         {
             for(TObjectPtr<UInputAction> IA: Pair.Value)
             {
@@ -48,25 +48,40 @@ bool UMeteorAbilityInputComponent::BindInputComponent(TObjectPtr<UEnhancedInputC
     return false;
 }
 
-void UMeteorAbilityInputComponent::UseActionGameplayAbility(const FInputActionInstance& InputInstance)
+void UMeteorAbilityInputComponent::TriggerInputAction(const FInputActionInstance& InputInstance)
 {
-    const UInputAction* Action = InputInstance.GetSourceAction();
+    const UInputAction* IA = InputInstance.GetSourceAction();
+    if(!TriggeredInputActions.Contains(IA))
+    {
+        TriggeredInputActions.Add(IA);
+    }
+}
+
+
+TArray<TObjectPtr<UActionGameplayAbility>> UMeteorAbilityInputComponent::GetActionGameplayAbility(const UInputAction* Action)
+{
+    TArray<TObjectPtr<UActionGameplayAbility>> Abilities;
     if (AbilitySystemComponent.IsValid())
     {
+        TObjectPtr<UActionGameplayAbility> * Ability = nullptr;
         if (AbilitySystemComponent->HasMatchingGameplayTag(OnActionTag))
         {
-            FGameplayAbilitySpecHandle* comboSpec = InputActionToComboAbilityMap.Find(Action);
-            if (comboSpec)
+            Ability = InputActionToComboAbilityMap.Find(Action);
+            if (Ability)
             {
-                AbilitySystemComponent->TryActivateAbility(*comboSpec, true);
+                Abilities.Add(*Ability);
+            }
+            else
+            {
+                UE_LOG(LogInput, Warning, TEXT("InputActionToAbilityMap does not contain %s"), *Action->GetFName().ToString());
             }
         }
         else
         {
-            FGameplayAbilitySpecHandle* basicSpec = InputActionToBasicAbilityMap.Find(Action);
-            if (basicSpec)
+            Ability = InputActionToBasicAbilityMap.Find(Action);
+            if (Ability)
             {
-                AbilitySystemComponent->TryActivateAbility(*basicSpec, true);
+                Abilities.Add(*Ability);
             }
             else
             {
@@ -74,12 +89,14 @@ void UMeteorAbilityInputComponent::UseActionGameplayAbility(const FInputActionIn
             }
         }
 
+        Ability = nullptr;
+        
         if (InputActionToAlwaysAbilityMap.Contains(Action))
         {
-            FGameplayAbilitySpecHandle* alwaysSpec = InputActionToAlwaysAbilityMap.Find(Action);
-            if (alwaysSpec)
+            Ability = InputActionToAlwaysAbilityMap.Find(Action);
+            if (Ability)
             {
-                AbilitySystemComponent->TryActivateAbility(*alwaysSpec, true);
+                Abilities.Add(*Ability);
             }
         }
     }
@@ -87,22 +104,24 @@ void UMeteorAbilityInputComponent::UseActionGameplayAbility(const FInputActionIn
     {
         UE_LOG(LogInput, Warning, TEXT("AbilitySystemComponent is not valid"));
     }
+    return Abilities;
 }
 
 void UMeteorAbilityInputComponent::BindActionInputAction(TObjectPtr<UInputAction> IA)
 {
     if (!BindedInputActions.Contains(IA) && BindedEnhancedInputComponent.Get())
     {
-        BindedEnhancedInputComponent->BindAction(IA, ETriggerEvent::Completed, this, &UMeteorAbilityInputComponent::UseActionGameplayAbility);
+        BindedEnhancedInputComponent->BindAction(IA, ETriggerEvent::Completed, this, &UMeteorAbilityInputComponent::TriggerInputAction);
         BindedInputActions.Add(IA);
     }
 }
 
 void UMeteorAbilityInputComponent::ActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility> Ability, TArray<UInputAction*> InputActions)
 {
-    if (ActionAbilityToSpec.Contains(Ability))
+    TObjectPtr<UActionGameplayAbility> AbilityObj = Ability.GetDefaultObject();
+    if (ActionAbilityToSpec.Contains(AbilityObj))
     {
-        FGameplayAbilitySpecHandle AbilitySpecHandle = ActionAbilityToSpec[Ability];
+        FGameplayAbilitySpecHandle AbilitySpecHandle = ActionAbilityToSpec[AbilityObj];
 
         for (UInputAction* InputAction : InputActions)
         {
@@ -113,7 +132,7 @@ void UMeteorAbilityInputComponent::ActiveActionGameplayAbilityComboInput(TSubcla
 
             if (!InputActionToComboAbilityMap.Find(InputAction))
             {
-                InputActionToComboAbilityMap.Add(InputAction, AbilitySpecHandle);
+                InputActionToComboAbilityMap.Add(InputAction, AbilityObj);
             }
             else
             {
@@ -129,15 +148,16 @@ void UMeteorAbilityInputComponent::ActiveActionGameplayAbilityComboInput(TSubcla
 
 void UMeteorAbilityInputComponent::DeActiveActionGameplayAbilityComboInput(TSubclassOf<UActionGameplayAbility> Ability, TArray<UInputAction*> InputActions)
 {
-    if (ActionAbilityToSpec.Contains(Ability))
+    TObjectPtr<UActionGameplayAbility> AbilityObj = Ability.GetDefaultObject();
+    if (ActionAbilityToSpec.Contains(AbilityObj))
     {
-        FGameplayAbilitySpecHandle AbilitySpecHandle = ActionAbilityToSpec[Ability];
+        FGameplayAbilitySpecHandle AbilitySpecHandle = ActionAbilityToSpec[AbilityObj];
 
         for (UInputAction* InputAction : InputActions)
         {
             if (InputActionToComboAbilityMap.Find(InputAction))
             {
-                if (InputActionToComboAbilityMap[InputAction] != AbilitySpecHandle)
+                if (InputActionToComboAbilityMap[InputAction] != AbilityObj)
                 {
                     UE_LOG(LogInput, Warning, TEXT("InputActionToBasicAbilityMap already contains action %s, ability: %s"), *InputAction->GetName(), *Ability->GetName());
                 }
@@ -162,17 +182,19 @@ bool UMeteorAbilityInputComponent::onAddActionGameplayAbility(TSubclassOf<UActio
 {
     if (Ability && GetOwnerRole() == ROLE_Authority && AbilitySystemComponent.IsValid())
     {
-        ActionAbilityToSpec.Add(Ability, AbilitySpecHandle);
+        TObjectPtr<UActionGameplayAbility> AbilityObj = Ability.GetDefaultObject();
+        
+        ActionAbilityToSpec.Add(AbilityObj, AbilitySpecHandle);
 
         TArray<TObjectPtr<UInputAction>> AbilityInputActions;
-
-        for (UInputAction* IA : Ability->GetDefaultObject<UActionGameplayAbility>()->BasicInputActions)
+        
+        for (UInputAction* IA : AbilityObj->BasicInputActions)
         {
             BindActionInputAction(IA);
 
             if (!InputActionToBasicAbilityMap.Contains(IA))
             {
-                InputActionToBasicAbilityMap.Add(IA, AbilitySpecHandle);
+                InputActionToBasicAbilityMap.Add(IA, AbilityObj);
             }
             else
             {
@@ -182,19 +204,19 @@ bool UMeteorAbilityInputComponent::onAddActionGameplayAbility(TSubclassOf<UActio
             AbilityInputActions.Add(IA);
         }
 
-        for (UInputAction* IA : Ability->GetDefaultObject<UActionGameplayAbility>()->ComboInputActions)
+        for (UInputAction* IA : AbilityObj->ComboInputActions)
         {
             BindActionInputAction(IA);
             AbilityInputActions.Add(IA);
         }
 
-        for (UInputAction* IA : Ability->GetDefaultObject<UActionGameplayAbility>()->AlwaysInputActions)
+        for (UInputAction* IA : AbilityObj->AlwaysInputActions)
         {
             BindActionInputAction(IA);
 
             if (!InputActionToAlwaysAbilityMap.Contains(IA))
             {
-                InputActionToAlwaysAbilityMap.Add(IA, AbilitySpecHandle);
+                InputActionToAlwaysAbilityMap.Add(IA, AbilityObj);
             }
             else
             {
@@ -204,7 +226,7 @@ bool UMeteorAbilityInputComponent::onAddActionGameplayAbility(TSubclassOf<UActio
             AbilityInputActions.Add(IA);
         }
 
-        ActionAbilityToInputActionMap.Add(Ability, AbilityInputActions);
+        ActionAbilityToInputActionMap.Add(AbilityObj, AbilityInputActions);
 
         return true;
     }
@@ -214,16 +236,59 @@ bool UMeteorAbilityInputComponent::onAddActionGameplayAbility(TSubclassOf<UActio
 
 void UMeteorAbilityInputComponent::onBeforeEvaluateInputDelegates()
 {
-    // if(GEngine)
-    // {
-    //     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("onBeforeEvaluateInputDelegates"));
-    // }
+    TriggeredInputActions.Empty();
 }
 
 void UMeteorAbilityInputComponent::onAfterEvaluateInputDelegates()
 {
-    if(GEngine)
+    TArray<TObjectPtr<UActionGameplayAbility>> Abilities;
+    
+    for(const UInputAction* IA: TriggeredInputActions)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("onAfterEvaluateInputDelegates"));
+        TArray<TObjectPtr<UActionGameplayAbility>> TriggeredAbilities = GetActionGameplayAbility(IA);
+        for(TObjectPtr<UActionGameplayAbility> Ability: TriggeredAbilities)
+        {
+            if(!Abilities.Contains(Ability))
+            {
+                Abilities.Add(Ability);
+            }
+        }
+    }
+
+    Abilities.StableSort([](const TObjectPtr<UActionGameplayAbility>& A, const TObjectPtr<UActionGameplayAbility>& B)
+    {
+        return A->GetInputPriority() > B->GetInputPriority();
+    });
+    
+    if(AbilitySystemComponent.Get() && Abilities.Num() > 0)
+    {
+        AbilitySystemComponent->TryActivateAbility(ActionAbilityToSpec[Abilities[0]]);
+    }
+}
+
+void UMeteorAbilityInputComponent::TriggerActionAbility()
+{
+    TArray<TObjectPtr<UActionGameplayAbility>> Abilities;
+    
+    for(const UInputAction* IA: TriggeredInputActions)
+    {
+        TArray<TObjectPtr<UActionGameplayAbility>> TriggeredAbilities = GetActionGameplayAbility(IA);
+        for(TObjectPtr<UActionGameplayAbility> Ability: TriggeredAbilities)
+        {
+            if(!Abilities.Contains(Ability))
+            {
+                Abilities.Add(Ability);
+            }
+        }
+    }
+
+    Abilities.StableSort([](const TObjectPtr<UActionGameplayAbility>& A, const TObjectPtr<UActionGameplayAbility>& B)
+    {
+        return A->GetInputPriority() > B->GetInputPriority();
+    });
+    
+    if(AbilitySystemComponent.Get() && Abilities.Num() > 0)
+    {
+        AbilitySystemComponent->TryActivateAbility(ActionAbilityToSpec[Abilities[0]]);
     }
 }

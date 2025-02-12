@@ -15,7 +15,6 @@ class UAbilitySystemComponent;
 class UEnhancedInputComponent;
 class UActionGameplayAbility;
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GASLEARN_API UMeteorAbilityInputComponent : public UActorComponent
 {
@@ -26,8 +25,10 @@ public:
 	UMeteorAbilityInputComponent();
 
 	bool BindInputComponent(TObjectPtr<UEnhancedInputComponent> EIC);
+
+	void TriggerInputAction(const FInputActionInstance& InputInstance);
 	
-	void UseActionGameplayAbility(const FInputActionInstance& InputInstance);
+	TArray<TObjectPtr<UActionGameplayAbility>> GetActionGameplayAbility(const UInputAction* Action);
 
 	void BindActionInputAction(TObjectPtr<UInputAction> IA);
 
@@ -42,6 +43,8 @@ public:
 
 	UFUNCTION()
 	void onAfterEvaluateInputDelegates();
+
+	void TriggerActionAbility();
 	
 	TWeakObjectPtr<class UAbilitySystemComponent> AbilitySystemComponent;
 	
@@ -49,12 +52,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	FGameplayTag OnActionTag;
+
+	TArray<const UInputAction *> TriggeredInputActions;
 	
-	TMap<TWeakObjectPtr<UInputAction>, FGameplayAbilitySpecHandle> InputActionToBasicAbilityMap;
-	TMap<TWeakObjectPtr<UInputAction>, FGameplayAbilitySpecHandle> InputActionToComboAbilityMap;
-	TMap<TWeakObjectPtr<UInputAction>, FGameplayAbilitySpecHandle> InputActionToAlwaysAbilityMap;
-	TMap<TSubclassOf<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>> ActionAbilityToInputActionMap;
-	TMap<TSubclassOf<UActionGameplayAbility>, FGameplayAbilitySpecHandle> ActionAbilityToSpec;
+	TMap<TWeakObjectPtr<UInputAction>, TObjectPtr<UActionGameplayAbility>> InputActionToBasicAbilityMap;
+	TMap<TWeakObjectPtr<UInputAction>, TObjectPtr<UActionGameplayAbility>> InputActionToComboAbilityMap;
+	TMap<TWeakObjectPtr<UInputAction>, TObjectPtr<UActionGameplayAbility>> InputActionToAlwaysAbilityMap;
+	TMap<TObjectPtr<UActionGameplayAbility>, TArray<TObjectPtr<UInputAction>>> ActionAbilityToInputActionMap;
+	TMap<TObjectPtr<UActionGameplayAbility>, FGameplayAbilitySpecHandle> ActionAbilityToSpec;
 	
 	TWeakObjectPtr<UEnhancedInputComponent> BindedEnhancedInputComponent;
 	
