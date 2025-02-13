@@ -15,6 +15,8 @@ UMeteorAbilityInputComponent::UMeteorAbilityInputComponent()
     PrimaryComponentTick.bCanEverTick = false;
     
     OnActionTag = FGameplayTag::RequestGameplayTag(FName("SpecialTag.ActionState.OnAction"));
+
+    inputLock = 0;
 }
 
 bool UMeteorAbilityInputComponent::BindInputComponent(TObjectPtr<UEnhancedInputComponent> EIC)
@@ -51,6 +53,15 @@ bool UMeteorAbilityInputComponent::BindInputComponent(TObjectPtr<UEnhancedInputC
 void UMeteorAbilityInputComponent::TriggerInputAction(const FInputActionInstance& InputInstance)
 {
     const UInputAction* IA = InputInstance.GetSourceAction();
+    if(IsInputBufferLocked())
+    {
+        // If the input buffer is locked, we will only add the allowed input actions to the buffer
+        if(AllowBufferInputActions.FindOrAdd(IA, 0) == 0)
+        {
+            return;
+        }
+    }
+    
     if(!TriggeredInputActions.Contains(IA))
     {
         TriggeredInputActions.Add(IA);
@@ -234,35 +245,44 @@ bool UMeteorAbilityInputComponent::onAddActionGameplayAbility(TSubclassOf<UActio
     return false;
 }
 
+void UMeteorAbilityInputComponent::StartInputBufferLock(TArray<UInputAction*> InputActions)
+{
+    inputLock += 1;
+    for(UInputAction* IA: InputActions)
+    {
+        AllowBufferInputActions[IA] = AllowBufferInputActions.FindOrAdd(IA, 0) + 1;
+    }
+}
+
+void UMeteorAbilityInputComponent::EndInputBufferLock(TArray<UInputAction*> InputActions)
+{
+    inputLock -= 1;
+    for(UInputAction* IA: InputActions)
+    {
+        AllowBufferInputActions[IA] = AllowBufferInputActions.FindOrAdd(IA, 1) - 1;
+    }
+}
+
+bool UMeteorAbilityInputComponent::IsInputBufferLocked()
+{
+    return inputLock > 0;
+}
+
+
 void UMeteorAbilityInputComponent::onBeforeEvaluateInputDelegates()
 {
-    TriggeredInputActions.Empty();
+    if(!IsInputBufferLocked())
+    {
+        // This is the function that will be called when the input buffer unlock
+        TriggerActionAbility(); 
+    }
 }
 
 void UMeteorAbilityInputComponent::onAfterEvaluateInputDelegates()
 {
-    TArray<TObjectPtr<UActionGameplayAbility>> Abilities;
-    
-    for(const UInputAction* IA: TriggeredInputActions)
+    if(!IsInputBufferLocked())
     {
-        TArray<TObjectPtr<UActionGameplayAbility>> TriggeredAbilities = GetActionGameplayAbility(IA);
-        for(TObjectPtr<UActionGameplayAbility> Ability: TriggeredAbilities)
-        {
-            if(!Abilities.Contains(Ability))
-            {
-                Abilities.Add(Ability);
-            }
-        }
-    }
-
-    Abilities.StableSort([](const TObjectPtr<UActionGameplayAbility>& A, const TObjectPtr<UActionGameplayAbility>& B)
-    {
-        return A->GetInputPriority() > B->GetInputPriority();
-    });
-    
-    if(AbilitySystemComponent.Get() && Abilities.Num() > 0)
-    {
-        AbilitySystemComponent->TryActivateAbility(ActionAbilityToSpec[Abilities[0]]);
+        TriggerActionAbility();
     }
 }
 
@@ -291,4 +311,6 @@ void UMeteorAbilityInputComponent::TriggerActionAbility()
     {
         AbilitySystemComponent->TryActivateAbility(ActionAbilityToSpec[Abilities[0]]);
     }
+    TriggeredInputActions.Empty();
+    AllowBufferInputActions.Empty();
 }

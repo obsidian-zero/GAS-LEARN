@@ -38,6 +38,12 @@ public:
 
 	bool onAddActionGameplayAbility(TSubclassOf<UActionGameplayAbility> Ability, FGameplayAbilitySpecHandle AbilitySpecHandle);
 
+	void StartInputBufferLock(TArray<UInputAction*> InputActions);
+
+	void EndInputBufferLock(TArray<UInputAction*> InputActions);
+
+	bool IsInputBufferLocked();
+	
 	UFUNCTION()
 	void onBeforeEvaluateInputDelegates();
 
@@ -54,6 +60,7 @@ public:
 	FGameplayTag OnActionTag;
 
 	TArray<const UInputAction *> TriggeredInputActions;
+	TMap<const UInputAction *, int32> AllowBufferInputActions;
 	
 	TMap<TWeakObjectPtr<UInputAction>, TObjectPtr<UActionGameplayAbility>> InputActionToBasicAbilityMap;
 	TMap<TWeakObjectPtr<UInputAction>, TObjectPtr<UActionGameplayAbility>> InputActionToComboAbilityMap;
@@ -62,5 +69,8 @@ public:
 	TMap<TObjectPtr<UActionGameplayAbility>, FGameplayAbilitySpecHandle> ActionAbilityToSpec;
 	
 	TWeakObjectPtr<UEnhancedInputComponent> BindedEnhancedInputComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category = "InputBuffer")
+	int32 inputLock;
 	
 };
